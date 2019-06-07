@@ -12,6 +12,10 @@ header:
 
 FPGA Tools and Code
 
+## Projects
+
+[Documentation Tools]({{site.baseurl}}/documentation_tools)
+
 ## Future Work
 
 Please feel free to create Issues and Pull Requests.
