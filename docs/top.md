@@ -24,8 +24,6 @@ FPGA Tools and Code
 
 {% include feature_row %}
 
-[Documentation Tools]({{site.baseurl}}/documentation_tools)
-
 ## Future Work
 
 Please feel free to create Issues and Pull Requests.
