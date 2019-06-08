@@ -20,7 +20,7 @@ feature_row:
 
 FPGA Tools and Code
 
-## Projects
+## Topics
 
 {% include feature_row %}
 
