@@ -45,9 +45,191 @@ Another effect of a lack of library behavior is that even companies providing FP
 
 **Pipelines** are a convention that aims to make connecting Verilog modules easier and promoting re-use.  They do this by formalizing how modules connect together by building on well known Ready/Valid signals, and then offering a shorthand to make this easier.
 
+## Motivation
+
+Pretending for a minute that the above problems did not exist, and that we had a decade or more of compatible IP library development, what would it be reasonable to expect to be able to do?  Dreaming a little...
+
+### USB Echo
+
+A simple character echo would have been so reassuring.  
+
+<div id="host_echo"></div>
+
+<script type="text/javascript">
+
+    var graph = {
+        color: "#EEE",
+        children: [
+            { id: "HOST", outPorts: ["usb"],
+                children: [
+                    { id: "term", label: "Serial Terminal"  }
+                ],
+                edges: [
+                    ["term", "HOST.usb"]
+                ]
+             },
+            { id: "FPGA", inPorts: [ "usb"],
+                children: [
+                    { id: "usb_s", label:"USB CDC", inPorts: ["usb"], outPorts:[ "in", "out" ]  }
+                ],
+                edges: [
+                    ["FPGA.usb","usb_s.usb" ],
+                    { route:["usb_s.in","usb_s.out" ], highlight:4}
+                ] }
+        ],
+        edges: [
+            [ "HOST.usb","FPGA.usb" ]
+        ]
+    }
+
+    hdelk.layout( graph, "host_echo" );
+</script>
+
+The `USB CDC` module is generic and reusable.  Note how thinking about it as a pipeline component and not a bus slave means interesting things can be done with it directly.  In this case just connecting `out` to `in`.
+
+
+### Function Tester
+
+While first learning, wouldn't it have been great to be able to write a math module and then test it in real hardware with a terminal program?  
+
+<div id="hello_function_tester"></div>
+
+<script type="text/javascript">
+
+    var graph = {
+        color: "#EEE",
+        children: [
+            { id: "HOST", outPorts: ["usb"],
+                children: [
+                    { id: "term", label: "Serial Terminal", type: "10,20"  }
+                ],
+                edges: [
+                    ["term", "HOST.usb"]
+                ]
+             },
+            { id: "FPGA", inPorts: [ "usb"],
+                children: [
+                    { id: "usb_s", label:"USB CDC", inPorts: ["usb"], outPorts:[ "in", "out" ]  },
+                    { id: "param1", type:"remove int string", inPorts: ["in"], outPorts:[ "out" ], southPorts:["int"]  },
+                    { id: "param2", type:"remove int string", inPorts: ["in"], outPorts:[ "out" ], southPorts:["int"]  },
+                    { id: "f", label:"f(a,b)->c", inPorts:["a", "b" ], outPorts:["c"], highlight:4  },
+                    { id: "return", type:"add int string", inPorts: ["in"], northPorts:["int"], outPorts:[ "out" ]  },
+                    { id: "unique", inPorts: ["in"], outPorts:[ "out" ]  }
+                ],
+                edges: [
+                    ["usb_s.out","param1.in" ],
+                    ["param1.out","param2.in" ], 
+                    ["param1.int","f.a" ], 
+                    ["param2.int","f.b" ], 
+                    ["f.c","return.int" ], 
+                    ["return.out","unique.in" ], 
+                    ["unique.out","usb_s.in" ], 
+                    ["FPGA.usb","usb_s.usb" ]
+                ] }
+        ],
+        edges: [
+            [ "HOST.usb","FPGA.usb" ]
+        ]
+    }
+
+    hdelk.layout( graph, "hello_function_tester" );
+</script>
+
+The `USB CDC` module is being reused.  It is not too far fetched to think of `remove int string` and `add int string` as general purpose reusable functions.  They would be customizable - with definable (via parameter) delimiters, etc.  `unique` would clearly have many uses.
+
+The handshaking on all the modules has small overhead and permits them to all govern their own execution.
+
+### Host Communication
+
+It would have been nice to be able to run some message passing code on the host, and have real delimited messages be available for local code.  Also, ideally if local code created messages, something to process those messages and get them back to the host, would have been great.
+
+<div id="host_communication"></div>
+
+<script type="text/javascript">
+
+    var graph = {
+        color: "#EEE",
+        children: [
+            { id: "HOST", outPorts: ["usb"],
+                children: [
+                    { id: "Lib", label:"Comms Lib"  },
+                    { id: "App"  }
+                ],
+                edges: [
+                    ["App","Lib"],
+                    ["Lib", "HOST.usb"]
+                ]
+             },
+            { id: "FPGA", inPorts: [ "usb"],
+                children: [
+                    { id: "usb_s", label:"USB Serial", inPorts: ["usb"], outPorts:[ "in", "out" ]  },
+                    { id: "escape", eastPorts: ["in"], westPorts:[ "out" ]  },
+                    { id: "unescape", inPorts: ["in"], outPorts:[ "out" ]  },
+                    { id: "Internals", type:"Verilog", westPorts:["in", "out" ], highlight:4  }
+                ],
+                edges: [
+                    ["FPGA.usb","usb_s.usb" ],
+                    ["Internals.out","escape.in"], 
+                    ["escape.out","usb_s.in"], 
+                    ["usb_s.out","unescape.in"], 
+                    ["unescape.out","Internals.in"]
+                ] }
+        ],
+        edges: [
+            [ "HOST.usb","FPGA.usb" ]
+        ]
+    }
+
+    hdelk.layout( graph, "host_communication" );
+</script>
+
+`escape` would turn the pipelines' `start` and `stop` packet delimiting signals into escape sequences, and `unescape` would do the opposite.  This would make sending messages over an 8bit line more convenient.
+
+### Other Ideas
+
+<div id="networking_idea"></div>
+
+<script type="text/javascript">
+
+    var graph = {
+        color: "#EEE",
+        children: [
+            { id: "FPGA",
+                children: [
+                    { id: "to_host", label:"to Host", port:1 },
+                    { id: "from_host", label:"from Host", port:1 },
+                    { id: "Internals", type:"Verilog", inPorts:["in"], outPorts:[ "out" ], highlight:4  }
+                ],
+                edges: [
+                    ["Internals.out","to_host"], 
+                    ["from_host","Internals.in"]
+                ] 
+            }
+        ]
+    }
+
+    hdelk.layout( graph, "networking_idea" );
+</script>
+
+High Speed FPGA-FPGA link
+
+Networking
+
+PID Controller
+
+PWM generator
+
+SPI Master
+
+I2C Master
+
+Driver code for an ADC chip
+
+Display Controller
+
 ## Design
 
-Let's motivate the development of Pipeline tools.  If you're intimately familiar with **Valid-Ready** interfaces you might like to skip ahead to the [Start + Stop](#start--stop) section.
+How to design a flexible pipelining system?  If you're intimately familiar with **Valid-Ready** interfaces you might like to skip ahead to the [Start + Stop](#start--stop) section.
 
 ### Data 
 
@@ -323,7 +505,7 @@ In this setup, there is a module `p1` that produces packets of data delineated w
 <script type="WaveDrom">
 { signal: [
    { name: 'clock',        wave: 'p..........'},
-   { name: 'p1.start',     wave: '0.10........' },
+   { name: 'p1.start',     wave: '0.10.......' },
    { name: 'p1.stop',      wave: '0.......10.' },
    { name: 'p1.data',      wave: 'x.2222222x.', data:'d1 d2 d3 d4 d5 d6 d7'},
    { name: 'p1.valid',     wave: '0.1......0.' },
@@ -375,7 +557,7 @@ Tools exist (as you'll see below) to manipulate the whole payload at once.
 
 This is very handy for modules that don't much care what the various fields are, they just want to do something correctly, transparently with the entire payload.  Like a fifo, or many communication modules.  
 
-## Pipeline Help
+## Implementation
 
 ### Visual Helpers
 
@@ -645,7 +827,7 @@ module sample #( parameter PipeSpec = `PS_d8 )(
 endmodule
 ```
 
-The `in_pipe` port will be the right size and we have a PipeSpec to use the code to help us out.
+The `in_pipe` port will be the right size, and we have the definition of the pipe, in the form of a PipeSpec available for later use, as we will see.
 
 Where are we?  Here's how connecting modules together by pipe used to look:
 
@@ -973,7 +1155,11 @@ module p_unpack_data_size #( parameter PipeSpec = `PS ) (
 endmodule
 ```
 
-## Possible Future Pipeline Additions
+## Futher Work
+
+### More Fields
+
+Since there is no runtime downside to having extra fields that are not being used, it is tempting to wonder about supporting other fields.  This has to be approached with caution, howeve, since adding features creates a requirement that existing modules support them.
 
 **Address** - When forming a read or write operation to a memory, it might be handy to have an Address field.
 
@@ -983,12 +1169,20 @@ endmodule
 
 **Flags** - sometimes a tiny bit of extra data is critical to have along side a data word, could a general facility be developed around a generic "flags" field of a certain width.
 
-## Futher Work
+### Spec Checking
+- Under Icarus, a kind of conditional compile time error can be created that can be used to cause errors when necessary.  Errors of configuration could stop the build process with an error message.  This would be very handy to allow modules to insist that connected pipes have certain features, for example, that their data width is greater or less than a certin amount, that the Start Stop signals are supported, etc.  What is a technique that works universally?
 
+### Code Cleanup
 - the macro's are a little scruffy still, they need another pass or two
+
+### Libraries
 - we need a "rich library of components"
 
-## Appendix - Fast Pipeline Programming
+## Appendix
+
+### Fast Pipeline Programming
+
+Ready - Valid handshaking is a great way for modules to connect together, at its best permitting controlled data transfers on every clock cycle.  Pure pipeline Producers Consumers are relatively easy to implement, but in a situation where a module is sending *and* receiving, things get complex.
 
 There is the ugly possibility that the middle module-in-a-chain, while receiving valid data from upstream, has its `ready` signal withdrawn from the downstream module, resulting in the need for the middle module to retain its data *and* store the next one.  Effects ripple back up the chain.
 
