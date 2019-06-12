@@ -138,7 +138,65 @@ reg:[
 
 ## HDElk Diagrams
 
-[HDElk](https://davidthings.github.io/hdelk/) (full disclosure, also written by DavidThings!) Was created to draw simple node-port diagrams.
+[HDElk](https://davidthings.github.io/hdelk/) (also written by DavidThings!) Was created to draw simple node-port diagrams.
+
+<div id="simple_diagram"></div>
+
+```js
+const simple_graph = {
+    id: "",
+    children: [
+        { id: "in", port: 1 },
+        { id: "one", ports: ["in", "out"] },
+        { id: "two", highlight:1, ports: ["in", "out"] },
+        { id: "three", ports: ["in", "out"] },
+        { id: "out", port: 1 }
+    ],
+    edges: [
+        ["in","one.in"],
+        {route:["one.out","two.in"],highlight:1},
+        {route:["two.out","three.in"],highlight:1,bus:1},
+        {route:["three.out","out"], bus:1 }
+    ]
+}
+```
+<div id="just_right_diagram"></div>
+
+```js
+const just_right_graph = {
+    id: "",
+    children: [
+        { id: "in", port: 1 },
+        { id: "one", type:"preprocess", ports: ["in", "out", "extra", "bypass"] },
+        { id: "two", highlight:0, color:"#F0F0F0",
+            ports: ["in", "out", "extra"],
+            children:[
+            {id:"Child1", ports:["in", "out", "extra", "feedback"]},
+            {id:"Child2", ports:["in", "out", "feedback"]},
+            {id:"Child3", highlight:2, ports:["in", "out"]}
+            ],
+            edges:[
+            [ "two.in", "Child1.in" ],
+            [ "two.extra", "Child1.extra" ],
+            [ "Child1.out", "Child2.in" ],
+            [ "Child2.feedback", "Child1.feedback" ],
+            [ "Child2.out", "Child3.in" ],
+            [ "Child3.out", "two.out" ]
+            ] },
+        { id: "three", type:"postprocess", ports: ["in", "bypass", "out"] },
+        { id: "out", port: 1 }
+    ],
+    edges: [
+        ["in","one.in"],
+        {route:["one.out","two.in"],highlight:1},
+        {route:["one.extra","two.extra"],highlight:1},
+        {route:["two.out","three.in"],highlight:1,bus:1},
+        {route:["three.out","out"], bus:1 },
+        {route:["one.bypass","three.bypass"],highlight:1}
+    ]
+}
+```
+
 
 <script type="text/javascript">
 
@@ -198,64 +256,6 @@ reg:[
 
 
 </script>
-
-<div id="simple_diagram"></div>
-
-```js
-const simple_graph = {
-    id: "",
-    children: [
-        { id: "in", port: 1 },
-        { id: "one", ports: ["in", "out"] },
-        { id: "two", highlight:1, ports: ["in", "out"] },
-        { id: "three", ports: ["in", "out"] },
-        { id: "out", port: 1 }
-    ],
-    edges: [
-        ["in","one.in"],
-        {route:["one.out","two.in"],highlight:1},
-        {route:["two.out","three.in"],highlight:1,bus:1},
-        {route:["three.out","out"], bus:1 }
-    ]
-}
-```
-
-<div id="just_right_diagram"></div>
-
-```js
-const just_right_graph = {
-    id: "",
-    children: [
-        { id: "in", port: 1 },
-        { id: "one", type:"preprocess", ports: ["in", "out", "extra", "bypass"] },
-        { id: "two", highlight:0, color:"#F0F0F0",
-            ports: ["in", "out", "extra"],
-            children:[
-            {id:"Child1", ports:["in", "out", "extra", "feedback"]},
-            {id:"Child2", ports:["in", "out", "feedback"]},
-            {id:"Child3", highlight:2, ports:["in", "out"]}
-            ],
-            edges:[
-            [ "two.in", "Child1.in" ],
-            [ "two.extra", "Child1.extra" ],
-            [ "Child1.out", "Child2.in" ],
-            [ "Child2.feedback", "Child1.feedback" ],
-            [ "Child2.out", "Child3.in" ],
-            [ "Child3.out", "two.out" ]
-            ] },
-        { id: "three", type:"postprocess", ports: ["in", "bypass", "out"] },
-        { id: "out", port: 1 }
-    ],
-    edges: [
-        ["in","one.in"],
-        {route:["one.out","two.in"],highlight:1},
-        {route:["one.extra","two.extra"],highlight:1},
-        {route:["two.out","three.in"],highlight:1,bus:1},
-        {route:["three.out","out"], bus:1 },
-        {route:["one.bypass","three.bypass"],highlight:1}
-    ]
-}
-```
 
 ## ThreeJS
 

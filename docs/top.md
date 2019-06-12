@@ -8,13 +8,13 @@ header:
   overlay_image: /assets/images/spokefpga_banner_dim.png
 feature_row:
 
-  # - image_path: /assets/images/pipelines.png
-  #   alt: "Pipelines"
-  #   title: "Pipelines"
-  #   excerpt: "Connecting FPGA Modules together with Pipes"
-  #   url: "/pipelines"
-  #   btn_label: "View"
-  #   btn_class: "btn--inverse"
+  - image_path: /assets/images/pipelines_2.png
+    alt: "Pipelines"
+    title: "Pipelines"
+    excerpt: "Connecting FPGA Modules together with Pipes"
+    url: "/pipelines"
+    btn_label: "View"
+    btn_class: "btn--inverse"
   # - image_path: /assets/images/spi.png
   #   alt: "SPI"
   #   title: "SPI"
@@ -29,7 +29,7 @@ feature_row:
   #   url: "/i2c"
   #   btn_label: "View"
   #   btn_class: "btn--inverse"
-  - image_path: /assets/images/doc_tools.png
+  - image_path: /assets/images/doc_tools_2.png
     alt: "Documentation Tools"
     title: "Documentation Tools"
     excerpt: "Some tools useful in the documentation of FPGAs"
