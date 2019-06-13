@@ -76,7 +76,7 @@ A simple character echo would have been so reassuring for a first timer.
                 ],
                 edges: [
                     ["FPGA.usb","usb_s.usb" ],
-                    { route:["usb_s.in","usb_s.out" ], highlight:4}
+                    { route:["usb_s.in","usb_s.out" ], highlight:1}
                 ] }
         ],
         edges: [
@@ -114,7 +114,7 @@ While first learning, wouldn't it have been great to be able to write a math mod
                     { id: "usb_s", label:"USB CDC", inPorts: ["usb"], outPorts:[ "in", "out" ]  },
                     { id: "param1", type:"remove int string", inPorts: ["in"], outPorts:[ "out" ], southPorts:["int"]  },
                     { id: "param2", type:"remove int string", inPorts: ["in"], outPorts:[ "out" ], southPorts:["int"]  },
-                    { id: "f", label:"f(a,b)->c", inPorts:["a", "b" ], outPorts:["c"], highlight:4  },
+                    { id: "f", label:"f(a,b)->c", inPorts:["a", "b" ], outPorts:["c"], highlight:1  },
                     { id: "return", type:"add int string", inPorts: ["in"], northPorts:["int"], outPorts:[ "out" ]  },
                     { id: "unique", inPorts: ["in"], outPorts:[ "out" ]  }
                 ],
@@ -157,7 +157,7 @@ It would have been nice to be able to run some message passing code on the host,
             { id: "HOST", outPorts: ["usb"],
                 children: [
                     { id: "Lib", label:"Comms Lib"  },
-                    { id: "App", highlight:4 }
+                    { id: "App", highlight:1 }
                 ],
                 edges: [
                     ["App","Lib"],
@@ -169,7 +169,7 @@ It would have been nice to be able to run some message passing code on the host,
                     { id: "usb_s", label:"usb serial", inPorts: ["usb"], outPorts:[ "in", "out" ]  },
                     { id: "escape", eastPorts: ["in"], westPorts:[ "out" ]  },
                     { id: "unescape", inPorts: ["in"], outPorts:[ "out" ]  },
-                    { id: "Internals", type:"Verilog", westPorts:["in", "out" ], highlight:4  }
+                    { id: "Internals", type:"Verilog", westPorts:["in", "out" ], highlight:1  }
                 ],
                 edges: [
                     ["FPGA.usb","usb_s.usb" ],
@@ -204,7 +204,7 @@ Let's use the following shorthand for this kind of host communication:
                 children: [
                     { id: "to_host", label:"to host", port:1 },
                     { id: "from_host", label:"from host", port:1 },
-                    { id: "Internals", type:"Verilog", inPorts:["in"], outPorts:[ "out" ], highlight:4  }
+                    { id: "Internals", type:"Verilog", inPorts:["in"], outPorts:[ "out" ], highlight:1  }
                 ],
                 edges: [
                     ["Internals.out","to_host"], 
@@ -236,7 +236,7 @@ FPGA pins can trivially toggle at hundreds of metahetz, so why aren't there off-
                     //{ id: "to_host", label:"to Host", port:1 },
                     //{ id: "from_host", label:"from Host", port:1 },
                     { id:"c1", label: "comms", inPorts:["in","out"], outPorts:["link"]},
-                    { id: "i1", label:"Internals", type:"Verilog", ports:[ "in","out" ], highlight:4  }
+                    { id: "i1", label:"Internals", type:"Verilog", ports:[ "in","out" ], highlight:1  }
                 ],
                 edges: [
                     //["i1.out","to_host"], 
@@ -250,7 +250,7 @@ FPGA pins can trivially toggle at hundreds of metahetz, so why aren't there off-
                 westPorts:[ "link" ],
                 children: [
                     { id:"c2", label: "comms", ports:["out","in"], westPorts:["link"]},
-                    { id:"i2", label:"Internals", type:"Verilog", ports:[ "in","out" ], highlight:4  }
+                    { id:"i2", label:"Internals", type:"Verilog", ports:[ "in","out" ], highlight:1  }
                 ],
                 edges: [
                     ["i2.out","c2.in"],
@@ -287,7 +287,7 @@ A small extension to the `comms` module would allow a ring network to be created
                     { id: "to_host", label:"to host", port:1 },
                     { id: "from_host", label:"from host", port:1 },
                     { id: "n1", label: "network", northPorts:["in","out"], ports:["net_in","net_out"]},
-                    { id: "i1", label:"Internals", type:"Verilog", ports:[ "h_in","h_out"], southPorts:[ "in","out" ], highlight:4  }
+                    { id: "i1", label:"Internals", type:"Verilog", ports:[ "h_in","h_out"], southPorts:[ "in","out" ], highlight:1  }
                 ],
                 edges: [
                     ["i1.h_out","to_host"], 
@@ -303,7 +303,7 @@ A small extension to the `comms` module would allow a ring network to be created
                 eastPorts:[ "net_out" ],
                 children: [
                     { id:"n2", label: "network", southPorts:["out","in"], westPorts:["net_in"], eastPorts:["net_out"]},
-                    { id:"i2", label:"Internals", type:"Verilog", northPorts:[ "in","out" ], highlight:4  }
+                    { id:"i2", label:"Internals", type:"Verilog", northPorts:[ "in","out" ], highlight:1  }
                 ],
                 edges: [
                     ["i2.out","n2.in"],
@@ -317,7 +317,7 @@ A small extension to the `comms` module would allow a ring network to be created
                 eastPorts:[ "net_out" ],
                 children: [
                     { id:"n3", label: "network", southPorts:["out","in"], westPorts:["net_in"], eastPorts:["net_out"]},
-                    { id:"i3", label:"Internals", type:"Verilog", northPorts:[ "in","out" ], highlight:4  }
+                    { id:"i3", label:"Internals", type:"Verilog", northPorts:[ "in","out" ], highlight:1  }
                 ],
                 edges: [
                     ["i3.out","n3.in"],
@@ -352,7 +352,7 @@ There are so many incredible SPI chips.  Wouldn't it have been great if it were 
             { id: "HOST", outPorts: ["usb"],
                 children: [
                     { id: "Lib", label:"Comms Lib"  },
-                    { id: "App", highlight:4  }
+                    { id: "App", highlight:1  }
                 ],
                 edges: [
                     ["App","Lib"],
@@ -383,6 +383,8 @@ There are so many incredible SPI chips.  Wouldn't it have been great if it were 
 
 The `spi master` accepts messages and puts their content out to the SPI bus.  Received data is returned.
 
+Of particular interest here is that *no functional code is written for the FPGA at all*.  All the functionality is provided by reusable library modules. 
+
 ### SPI Devices 
 
 Could we go further?  Take an IMU as an example - wouldn't it have been great if it were possible to wrap the `spi master` module with code that handles the IMU's initialization and interface requirements and then just get IMU data out of it?
@@ -396,7 +398,7 @@ Could we go further?  Take an IMU as an example - wouldn't it have been great if
         children: [
             { id: "FPGA", eastPorts:[ "spi" ],
                 children: [
-                    { id:"i", label:"Internals", type:"Verilog", southPorts:[ "accel","rot","mag" ], highlight:4  },
+                    { id:"i", label:"Internals", type:"Verilog", southPorts:[ "accel","rot","mag" ], highlight:1  },
                     { id: "imu", label:"imu spi", northPorts:["accel","rot","mag" ], eastPorts:["spi"]  }
                 ],
                 edges: [
