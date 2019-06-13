@@ -14,22 +14,24 @@ header:
 
 ## Introduction
 
-The purpose of this document is to motivate and describe a proposal that might be helpful in getting some more reuse to happen in the world of FPGA design.  The target audience will be people who are familiar with Verilog, and who are interested in developing ways to connect IP.
+The purpose of this document is to motivate and describe a proposal that might promote more reuse in the world of small FPGA IP design. The target audience will be people who are familiar with Verilog, and who are interested in developing ways to better connect IP.
 
-An overview of the problem is outlined initially, then the concepts behind pipelines are described.  Finally, Verilog code techniques for conveniently implementing and manipulating complex pipelines are presented.
+In a sense what follows is all rather known or obvious, and there is little new innovation presented, but that really underscores how strange it is that we don't have a huge range of compatible libraries of functionality to play with as FPGA engineers. 
+
+An [Overview](#overview) of the problem is outlined initially, followed by a [Motivation](#motivation) section with a few "wouldn't it be nice" examples. The [Design](#design) section goes through the creation of a systematic pipeline and finally, in [Implementation](#implementation) there are some proposals for how pipleines might be implemented.
 
 ## Overview
 
-The first thing that strikes new FPGA engineers is *where the heck are all the code libraries?* There are a few places, like [FuseSoC Cores](https://github.com/fusesoc/fusesoc-cores), [OpenCores](https://opencores.org/), [OH](https://github.com/parallella/oh) but there is nothing like the thousands of libraries available to software developers using Python, Javascript, C, C++, or indeed any language.  Considering that Verilog is *decades* older than some of these incredibly well stocked languages, the mystery deepens.
+The first thing that strikes new FPGA engineers is *where the heck are all the code libraries?* There are a few places, like [FuseSoC Cores](https://github.com/fusesoc/fusesoc-cores), [OpenCores](https://opencores.org/), [OH](https://github.com/parallella/oh) but there is nothing like the thousands of libraries available to software developers using Python, Javascript, C, C++, or indeed almost any modern programming language.  Considering that Verilog is *decades* older than some of these incredibly well stocked languages, the mystery deepens.
 
-What are some of the causes of this lack of compatible libraries?
+What are some of the causes of the lack of rich compatible, composable, libraries?
 
 - lack of interface standards (eg. even ready/valid connections have different names and different semantics)
 - vendor lock-in - intentional or incidental.  Libraries provided for use with a particular platform may use platform specific features, making them locked to that particular architecture and often via license unsharable.
 - varying provison of and need for fullness of design makes a module look less appealling (a complete module may feel too heavy to someone looking for a minimal implementation, and vice versa)
 - company libraries don't destinquish proprietary code from code that could potentially be shared, and so it becomes hard to extact code for sharing.
 - lack of a open library tradition.  When engineers don't have a practice of grabbing code from GitHub or similar, it doesn't occur to them to contribute it back.
-- lack of a connecting component tradition.   Designs don't seem to emphasize interconnection as a priority.
+- lack of a connecting component tradition.   Designs don't seem to emphasize generic interconnection as a priority.
 - ASIC designers may have a "one and done" orientation.  Designs are very focussed on a single target product, not sharable libraries, and when a design has sucessfully made it into silicon there is very little incentive to reuse that IP other than within the same team.
 - the HDL world is split into Verilog and VHDL meaning that much code is "in the wrong language"
 - the very low level HDL operates at means implementation strategies can vary widely, being appealing to some and not to others.  
@@ -51,14 +53,14 @@ Pretending for a minute that the above problems did not exist, and that we had a
 
 ### USB Echo
 
-A simple character echo would have been so reassuring.  
+A simple character echo would have been so reassuring for a first timer.  
 
 <div id="host_echo"></div>
 
 <script type="text/javascript">
 
     var graph = {
-        color: "#EEE",
+        color: "#666",
         children: [
             { id: "HOST", outPorts: ["usb"],
                 children: [
@@ -97,7 +99,7 @@ While first learning, wouldn't it have been great to be able to write a math mod
 <script type="text/javascript">
 
     var graph = {
-        color: "#EEE",
+        color: "#666",
         children: [
             { id: "HOST", outPorts: ["usb"],
                 children: [
@@ -137,23 +139,25 @@ While first learning, wouldn't it have been great to be able to write a math mod
 
 The `USB CDC` module is being reused.  It is not too far fetched to think of `remove int string` and `add int string` as general purpose reusable functions.  They would be customizable - with definable (via parameter) delimiters, etc.  `unique` would clearly have many uses.
 
+The only code that would need to be written is the new code in the function module.
+
 The handshaking on all the modules has small overhead and permits them to all govern their own execution.
 
 ### Host Communication
 
-It would have been nice to be able to run some message passing code on the host, and have real delimited messages be available for local code.  Also, ideally if local code created messages, something to process those messages and get them back to the host, would have been great.
+It would have been nice to be able to run some message passing code on the host, and have real delimited packets be available for local code.  Also, ideally if local code created packets, something to process them and get them back to the host, that would have been great, too.
 
 <div id="host_communication"></div>
 
 <script type="text/javascript">
 
     var graph = {
-        color: "#EEE",
+        color: "#666",
         children: [
             { id: "HOST", outPorts: ["usb"],
                 children: [
                     { id: "Lib", label:"Comms Lib"  },
-                    { id: "App"  }
+                    { id: "App", highlight:4 }
                 ],
                 edges: [
                     ["App","Lib"],
@@ -162,7 +166,7 @@ It would have been nice to be able to run some message passing code on the host,
              },
             { id: "FPGA", inPorts: [ "usb"],
                 children: [
-                    { id: "usb_s", label:"USB Serial", inPorts: ["usb"], outPorts:[ "in", "out" ]  },
+                    { id: "usb_s", label:"usb serial", inPorts: ["usb"], outPorts:[ "in", "out" ]  },
                     { id: "escape", eastPorts: ["in"], westPorts:[ "out" ]  },
                     { id: "unescape", inPorts: ["in"], outPorts:[ "out" ]  },
                     { id: "Internals", type:"Verilog", westPorts:["in", "out" ], highlight:4  }
@@ -185,19 +189,21 @@ It would have been nice to be able to run some message passing code on the host,
 
 `escape` would turn the pipelines' `start` and `stop` packet delimiting signals into escape sequences, and `unescape` would do the opposite.  This would make sending messages over an 8bit line more convenient.
 
-### Other Ideas
+Again, the only code that would need to be written in this case is the highlighted code : the app code on the host and the Verilog internal code on the FPGA. 
 
-<div id="networking_idea"></div>
+Let's use the following shorthand for this kind of host communication:
+
+<div id="host_template"></div>
 
 <script type="text/javascript">
 
     var graph = {
-        color: "#EEE",
+        color: "#666",
         children: [
             { id: "FPGA",
                 children: [
-                    { id: "to_host", label:"to Host", port:1 },
-                    { id: "from_host", label:"from Host", port:1 },
+                    { id: "to_host", label:"to host", port:1 },
+                    { id: "from_host", label:"from host", port:1 },
                     { id: "Internals", type:"Verilog", inPorts:["in"], outPorts:[ "out" ], highlight:4  }
                 ],
                 edges: [
@@ -208,24 +214,238 @@ It would have been nice to be able to run some message passing code on the host,
         ]
     }
 
+    hdelk.layout( graph, "host_template" );
+</script>
+
+The `to Host` and `from Host` ports will be assumed to take and provide messages from the host code.
+
+### FPGA Comms
+
+FPGA pins can trivially toggle at hundreds of metahetz, so why aren't there off-the-shelf, architecture independent modules to create fast, reliable message communication? 
+
+<div id="fpga_comms"></div>
+
+<script type="text/javascript">
+
+    var graph = {
+        color: "#666",
+        children: [
+            { id: "FPGA1",
+                eastPorts:[ "link" ],
+                children: [
+                    //{ id: "to_host", label:"to Host", port:1 },
+                    //{ id: "from_host", label:"from Host", port:1 },
+                    { id:"c1", label: "comms", inPorts:["in","out"], outPorts:["link"]},
+                    { id: "i1", label:"Internals", type:"Verilog", ports:[ "in","out" ], highlight:4  }
+                ],
+                edges: [
+                    //["i1.out","to_host"], 
+                    //["from_host","i1.in"],
+                    ["i1.out","c1.in"],
+                    ["c1.out","i1.in"],
+                    ["c1.link","FPGA1.link"]
+                ] 
+            },
+            { id: "FPGA2",
+                westPorts:[ "link" ],
+                children: [
+                    { id:"c2", label: "comms", ports:["out","in"], westPorts:["link"]},
+                    { id:"i2", label:"Internals", type:"Verilog", ports:[ "in","out" ], highlight:4  }
+                ],
+                edges: [
+                    ["i2.out","c2.in"],
+                    ["c2.out","i2.in"],
+                    ["FPGA2.link","c2.link"]
+                ] 
+            }
+        ],
+        edges:[
+            ["FPGA1.link","FPGA2.link"]
+        ]
+    }
+
+    hdelk.layout( graph, "fpga_comms" );
+</script>
+
+The `comms` module would create a bi-directional, reliable link and would transparently deliver messages from one FPGA to another.
+
+### Networking
+
+A small extension to the `comms` module would allow a ring network to be created between nodes.  Distributed applications could be built with these tools.
+
+<div id="networking_idea"></div>
+
+<script type="text/javascript">
+
+    var graph = {
+        color: "#666",
+        children: [
+            { id: "FPGA1",
+                westPorts:[ "net_in" ],
+                eastPorts:[ "net_out" ],
+                children: [
+                    { id: "to_host", label:"to host", port:1 },
+                    { id: "from_host", label:"from host", port:1 },
+                    { id: "n1", label: "network", northPorts:["in","out"], ports:["net_in","net_out"]},
+                    { id: "i1", label:"Internals", type:"Verilog", ports:[ "h_in","h_out"], southPorts:[ "in","out" ], highlight:4  }
+                ],
+                edges: [
+                    ["i1.h_out","to_host"], 
+                    ["from_host","i1.h_in"],
+                    ["i1.out","n1.in"],
+                    ["n1.out","i1.in"],
+                    ["FPGA1.net_in","n1.net_in"],
+                    ["n1.net_out","FPGA1.net_out"]
+                ] 
+            },
+            { id: "FPGA2",
+                westPorts:[ "net_in" ],
+                eastPorts:[ "net_out" ],
+                children: [
+                    { id:"n2", label: "network", southPorts:["out","in"], westPorts:["net_in"], eastPorts:["net_out"]},
+                    { id:"i2", label:"Internals", type:"Verilog", northPorts:[ "in","out" ], highlight:4  }
+                ],
+                edges: [
+                    ["i2.out","n2.in"],
+                    ["n2.out","i2.in"],
+                    ["FPGA2.net_in","n2.net_in"],
+                    ["n2.net_out","FPGA2.net_out"]
+                ] 
+            },
+            { id: "FPGA3",
+                westPorts:[ "net_in" ],
+                eastPorts:[ "net_out" ],
+                children: [
+                    { id:"n3", label: "network", southPorts:["out","in"], westPorts:["net_in"], eastPorts:["net_out"]},
+                    { id:"i3", label:"Internals", type:"Verilog", northPorts:[ "in","out" ], highlight:4  }
+                ],
+                edges: [
+                    ["i3.out","n3.in"],
+                    ["n3.out","i3.in"],
+                    ["FPGA3.net_in","n3.net_in"],
+                    ["n3.net_out","FPGA3.net_out"]
+                ] 
+            }
+
+        ],
+        edges:[
+            ["FPGA1.net_out","FPGA2.net_in"],
+            ["FPGA2.net_out","FPGA3.net_in"],
+            ["FPGA3.net_out","FPGA1.net_in"]
+        ]
+    }
+
     hdelk.layout( graph, "networking_idea" );
 </script>
 
-High Speed FPGA-FPGA link
+### SPI Interface
 
-Networking
+There are so many incredible SPI chips.  Wouldn't it have been great if it were possible to experiment with these devices from a host?
 
-PID Controller
+<div id="spi_interface"></div>
 
-PWM generator
+<script type="text/javascript">
 
-SPI Master
+    var graph = {
+        color: "#666",
+        children: [
+            { id: "HOST", outPorts: ["usb"],
+                children: [
+                    { id: "Lib", label:"Comms Lib"  },
+                    { id: "App", highlight:4  }
+                ],
+                edges: [
+                    ["App","Lib"],
+                    ["Lib", "HOST.usb"]
+                ]
+             },
+            { id: "FPGA", westPorts: [ "usb"], eastPorts:[ "spi" ],
+                children: [
+                    { id: "usb_m", label:"usb msg", inPorts: ["usb"], outPorts:[ "in", "out" ]  },
+                    { id: "spi", label:"spi master", westPorts:["out", "in" ], eastPorts:["spi"]  }
+                ],
+                edges: [
+                    ["FPGA.usb","usb_m.usb" ],
+                    ["spi.out","usb_m.in"], 
+                    ["usb_m.out","spi.in"], 
+                    ["spi.spi","FPGA.spi"]
+                ] },
+            { id: "s", label:"SPI Device", inPorts: [ "spi" ] }
+        ],
+        edges: [
+            [ "HOST.usb","FPGA.usb" ],
+            [ "FPGA.spi","s.spi" ]
+        ]
+    }
 
-I2C Master
+    hdelk.layout( graph, "spi_interface" );
+</script>
 
-Driver code for an ADC chip
+The `spi master` accepts messages and puts their content out to the SPI bus.  Received data is returned.
 
-Display Controller
+### SPI Devices 
+
+Could we go further?  Take an IMU as an example - wouldn't it have been great if it were possible to wrap the `spi master` module with code that handles the IMU's initialization and interface requirements and then just get IMU data out of it?
+
+<div id="spi_imu"></div>
+
+<script type="text/javascript">
+
+    var graph = {
+        color: "#666",
+        children: [
+            { id: "FPGA", eastPorts:[ "spi" ],
+                children: [
+                    { id:"i", label:"Internals", type:"Verilog", southPorts:[ "accel","rot","mag" ], highlight:4  },
+                    { id: "imu", label:"imu spi", northPorts:["accel","rot","mag" ], eastPorts:["spi"]  }
+                ],
+                edges: [
+                    ["imu.accel","i.accel"], 
+                    ["imu.rot","i.rot"], 
+                    ["imu.mag","i.mag"], 
+                    ["imu.spi","FPGA.spi"]
+                ] },
+            { id: "i", label:"IMU Device", inPorts: [ "spi" ] }
+        ],
+        edges: [
+            [ "FPGA.spi","i.spi" ]
+        ]
+    }
+
+    hdelk.layout( graph, "spi_imu" );
+</script>
+
+Of course there would need to be a some configuration, etc. but this module should exist - one for each type of IMU.
+
+ADC's in general are another kind of SPI-based device that would be incredible to have code libraries available for.  The list of the devices is long.
+
+Another good point to be emphazed here is that the pipeline code needs to be in pure Verilog, because it needs to be possible to *wrap* pipeline modules in code to create new pipeline modules.  In the above example, there would be an SPI Master pipeline module *inside* the `imu spi` module, doing all the SPI master stuff.  The code around it would handle initialization, and getting data in and out of the device.
+
+### Other Ideas
+
+Of course there are thousands of other applications like this.
+
+- PID Controller
+- PWM generator
+- I2C Master
+- GPIO
+- Display Controller
+
+The foregoing have been heavily biased towards interfacing and communicating but there are many internal functions that could benefit from the Pipeline approach.  For example,
+
+- multiplication, division, CORDIC functions, filtering, etc.
+- memory - fifo's, caches, etc
+- parsing and generating structured messages
+
+Things that are often specific to a particular FPGA family could be wrapped up providing a way to isolate libraries needing to know these details.  For example,
+
+- LVDS IO
+- Clock PLLs
+- FPGA internals
+
+Finally various *combinations* of pipeline components could be put together to make even more interesting functionality.  The new modules so formed would themselves be pipeline modules, reusable, and with all the other desirable pipeline characteristics. 
+
+The hope in providing so many examples is to build the case for a Pipelining approach.  But is it even feasible and convenient to express these ideas in FPGAs?  Let's now turn to how we might do that.
 
 ## Design
 
@@ -1161,13 +1381,10 @@ endmodule
 
 Since there is no runtime downside to having extra fields that are not being used, it is tempting to wonder about supporting other fields.  This has to be approached with caution, howeve, since adding features creates a requirement that existing modules support them.
 
-**Address** - When forming a read or write operation to a memory, it might be handy to have an Address field.
-
-**Meta Character** - When communicating over a lossy channel, it is frequently desirable to have access to meta characters (message start, message end, message crc follows, etc.)
-
-**Error** - Perhaps it might be useful to send an error signal that many different kinds of module could interpret
-
-**Flags** - sometimes a tiny bit of extra data is critical to have along side a data word, could a general facility be developed around a generic "flags" field of a certain width.
+- **Address** - When forming a read or write operation to a memory, it might be handy to have an Address field.
+- **Meta Character** - When communicating over a lossy channel, it is frequently desirable to have access to meta characters (message start, message end, message crc follows, etc.)
+- **Error** - Perhaps it might be useful to send an error signal that many different kinds of module could interpret
+- **Flags** - sometimes a tiny bit of extra data is critical to have along side a data word, could a general facility be developed around a generic "flags" field of a certain width.
 
 ### Spec Checking
 - Under Icarus, a kind of conditional compile time error can be created that can be used to cause errors when necessary.  Errors of configuration could stop the build process with an error message.  This would be very handy to allow modules to insist that connected pipes have certain features, for example, that their data width is greater or less than a certin amount, that the Start Stop signals are supported, etc.  What is a technique that works universally?
