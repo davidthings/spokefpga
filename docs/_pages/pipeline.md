@@ -60,7 +60,7 @@ A simple character echo would have been so reassuring for a first timer.
 <script type="text/javascript">
 
     var graph = {
-        color: "#666",
+        color: "#555",
         children: [
             { id: "HOST", outPorts: ["usb"],
                 children: [
@@ -99,7 +99,7 @@ While first learning, wouldn't it have been great to be able to write a math mod
 <script type="text/javascript">
 
     var graph = {
-        color: "#666",
+        color: "#555",
         children: [
             { id: "HOST", outPorts: ["usb"],
                 children: [
@@ -152,7 +152,7 @@ It would have been nice to be able to run some message passing code on the host,
 <script type="text/javascript">
 
     var graph = {
-        color: "#666",
+        color: "#555",
         children: [
             { id: "HOST", outPorts: ["usb"],
                 children: [
@@ -198,7 +198,7 @@ Let's use the following shorthand for this kind of host communication:
 <script type="text/javascript">
 
     var graph = {
-        color: "#666",
+        color: "#555",
         children: [
             { id: "FPGA",
                 children: [
@@ -228,7 +228,7 @@ FPGA pins can trivially toggle at hundreds of metahetz, so why aren't there off-
 <script type="text/javascript">
 
     var graph = {
-        color: "#666",
+        color: "#555",
         children: [
             { id: "FPGA1",
                 eastPorts:[ "link" ],
@@ -278,7 +278,7 @@ A small extension to the `comms` module would allow a ring network to be created
 <script type="text/javascript">
 
     var graph = {
-        color: "#666",
+        color: "#555",
         children: [
             { id: "FPGA1",
                 westPorts:[ "net_in" ],
@@ -347,7 +347,7 @@ There are so many incredible SPI chips.  Wouldn't it have been great if it were 
 <script type="text/javascript">
 
     var graph = {
-        color: "#666",
+        color: "#555",
         children: [
             { id: "HOST", outPorts: ["usb"],
                 children: [
@@ -392,7 +392,7 @@ Could we go further?  Take an IMU as an example - wouldn't it have been great if
 <script type="text/javascript">
 
     var graph = {
-        color: "#666",
+        color: "#555",
         children: [
             { id: "FPGA", eastPorts:[ "spi" ],
                 children: [
