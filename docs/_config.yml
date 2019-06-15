@@ -11,7 +11,7 @@ locale                   : "en-US"
 title                    : "SpokeFPGA"
 title_separator          : "-"
 name                     : "SpokeFPGA"
-description              : "FPGA Tools and Library"
+description              : "FPGA Information, Tools and Libraries"
 url                      : https://davidthings.github.io/
 baseurl                  : /spokefpga
 repository               : # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
