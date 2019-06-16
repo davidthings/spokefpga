@@ -14,6 +14,10 @@ layout: default
   {% endunless %}
 {% endif %}
 
+{% if page.railroad %}
+<link rel='stylesheet' href='{{site.baseurl}}/assets/css/railroad-diagrams.css'>
+<script src='{{site.baseurl}}/assets/js/railroad-diagrams.js'></script>
+{% endif %}
 
 {% if page.threejs %}
 <script src="{{site.baseurl}}/assets/js/three.min.js"></script>

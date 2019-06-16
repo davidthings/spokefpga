@@ -7,6 +7,7 @@ toc_label: Contents
 toc_sticky: true
 wavedrom : 1
 threejs: 1
+railroad: 1
 header:
   title: Tutorial
   overlay_image: /assets/images/spokefpga_banner_thin.png
@@ -225,17 +226,18 @@ const just_right_graph = {
             { id: "in", port: 1 },
             { id: "one", type:"preprocess", ports: ["in", "out", "extra", "bypass"] },
             { id: "two", highlight:0, color:"#F0F0F0",
-              ports: ["in", "out", "extra"],
+              inPorts: ["in", "extra"],
+              outPorts: ["out"],
               children:[
-                {id:"Child1", ports:["in", "out", "extra", "feedback"]},
-                {id:"Child2", ports:["in", "out", "feedback"]},
+                {id:"Child1", inPorts:["in", "extra", "feedback"], outPorts:["out"]},
+                {id:"Child2", inPorts:["in", "extra", "feedback"], ports:[ "out"]},
                 {id:"Child3", highlight:2, ports:["in", "out"]}
                ],
               edges:[
                 [ "two.in", "Child1.in" ],
                 [ "two.extra", "Child1.extra" ],
                 [ "Child1.out", "Child2.in" ],
-                [ "Child2.feedback", "Child1.feedback" ],
+                [ "Child1.feedback", "Child2.feedback" ],
                 [ "Child2.out", "Child3.in" ],
                 [ "Child3.out", "two.out" ]
               ] },
@@ -255,6 +257,54 @@ const just_right_graph = {
     hdelk.layout( just_right_graph, "just_right_diagram" );
 
 
+</script>
+
+## Railroad-Diagrams
+
+[Railroad-Diagram](https://github.com/tabatkins/railroad-diagrams) Generator from tabatkins
+
+>A small JS+SVG library for drawing railroad syntax diagrams, like on JSON.org. Now with a Python port!
+
+### Value
+<script>
+ComplexDiagram(
+  Sequence( Terminal('type-tag'),
+      Choice( 0, NonTerminal('int'),
+                NonTerminal('float'),
+                NonTerminal('fixed'),
+                NonTerminal('string'),
+                NonTerminal('object'),
+                NonTerminal('array')
+                )
+  )
+).addTo();
+</script>
+
+### Object
+<script>
+ComplexDiagram(
+  Choice( 0,  Sequence(
+                  ZeroOrMore(
+                      Sequence(
+                          NonTerminal('value'),
+                          NonTerminal('value')
+                      )
+                  ),
+                 Terminal('end-object')
+             ) )
+).addTo();
+</script>
+
+### Array
+<script>
+ComplexDiagram(
+  Choice( 0,  Sequence(
+                  ZeroOrMore(
+                      NonTerminal('value'),
+                  ),
+                 Terminal('end-array')
+             ) )
+).addTo();
 </script>
 
 ## ThreeJS
