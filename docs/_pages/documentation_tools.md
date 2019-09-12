@@ -237,7 +237,7 @@ const just_right_graph = {
                 [ "two.in", "Child1.in" ],
                 [ "two.extra", "Child1.extra" ],
                 [ "Child1.out", "Child2.in" ],
-                [ "Child1.feedback", "Child2.feedback" ],
+                [ "Child2.feedback", "Child1.feedback", -1 ],
                 [ "Child2.out", "Child3.in" ],
                 [ "Child3.out", "two.out" ]
               ] },
