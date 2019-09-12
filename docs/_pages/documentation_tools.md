@@ -426,3 +426,78 @@ animate();
 
   ...
   ```
+
+## Highlight
+
+Javascript-based Code Highlighter
+
+<link rel="stylesheet" href="{{site.baseurl}}/assets/css/highlight.default.min.css">
+<script src="{{site.baseurl}}/assets/js/highlight.min.js"></script>
+
+<div id="highlight_ex"></div>
+
+<script>
+
+var s = "assign a_thing = another_thing;"
+
+var dp = document.getElementById( "highlight_ex" );
+dp.innerHTML = s;
+dp.classList.add("verilog");
+
+hljs.highlightBlock(dp);
+
+</script>
+
+```js
+var s = "assign a_thing = another_thing;"
+
+var dp = document.getElementById( "highlight_ex" );
+dp.innerHTML = s;
+dp.classList.add("verilog");
+
+hljs.highlightBlock(dp);
+```
+
+## CodeMirror
+
+<script src="{{site.baseurl}}/assets/js/codemirror.js"></script>
+<link rel="stylesheet" href="{{site.baseurl}}/assets/css/codemirror.css">
+<script src="{{site.baseurl}}/assets/js/cm_javascript.js"></script>
+
+
+<div>
+  <textarea rows="4" cols="50" id="codesnippet" name="codesnippet">
+
+var g = { };
+
+  </textarea>
+</div>
+
+<script>
+    var codeMirror = CodeMirror.fromTextArea(document.getElementById('codesnippet'), {
+        mode: "javascript",
+        theme: "default",
+        lineNumbers: true,
+        readOnly: false
+    });
+</script>
+
+``` html
+
+<div>
+  <textarea rows="4" cols="50" id="codesnippet" name="codesnippet">
+
+var g = { };
+
+  </textarea>
+</div>
+
+<script>
+    var codeMirror = CodeMirror.fromTextArea(document.getElementById('codesnippet'), {
+        mode: "javascript",
+        theme: "default",
+        lineNumbers: true,
+        readOnly: false
+    });
+</script>
+```

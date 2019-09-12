@@ -71,19 +71,41 @@ var hdelk = (function(){
 
         drawDummy.clear();
 
-        elk.layout(graph)
-            .then(function(g) {
+        var mp = document.getElementById( divname + "_message" );
+        if ( mp ) {
+            mp.style.display = "none";
+        }
 
-                var dp = document.getElementById( divname + "_preprocessed" );
-                if ( dp )
-                    dp.innerHTML = "<pre style='font-size:10px'>" + JSON.stringify(graph, null, " ") + "</pre>";
+        try {
+            var ep = elk.layout(graph);
 
-                var d = document.getElementById( divname + "_elk" );
-                if ( d )
-                    d.innerHTML = "<pre style='font-size:8px'>" + JSON.stringify(g, null, " ") + "</pre>";
+            ep.then(function(g) {
+                    var dp = document.getElementById( divname + "_preprocessed" );
+                    if ( dp )
+                        dp.innerHTML = "<pre style='font-size:10px'>" + JSON.stringify(graph, null, " ") + "</pre>";
 
-                diagram( divname, g );
+                    var d = document.getElementById( divname + "_elk" );
+                    if ( d )
+                        d.innerHTML = "<pre style='font-size:8px'>" + JSON.stringify(g, null, " ") + "</pre>";
+
+                    diagram( divname, g );
+
+                    })
+
+            ep.catch( function(err){
+                var dp = document.getElementById( divname );
+                dp.innerHTML = "";
+                var mp = document.getElementById( divname + "_message" );
+                if ( mp ) {
+                    mp.innerHTML = err;
+                    mp.style.display = "block";
+                }
             })
+        } catch( err ) {
+            var dp = document.getElementById( divname );
+            dp.innerHTML = "";
+            console.log( err );
+        }
     }
 
     /**
@@ -366,16 +388,32 @@ var hdelk = (function(){
                     newItem.sources = [ item[ 0 ] ];
                     newItem.targets = [ item[ 1 ] ];
                     if ( item[ 2 ] ) {
-                        if ( typeof( item[2] ) == "string" )    
+                        if ( typeof( item[2] ) == "string" )
                             newItem.label = item[ 2 ];
-                        else
-                            newItem.bus = 1;
+                        else if ( item[ 2 ] == -1 ) {
+                            newItem.reverse = 1;
+                        } else
+                            if ( item[2 ] == 1 )
+                                newItem.bus = 1;
                     }
                     if ( item[ 3 ] ) {
-                        if ( typeof( item[3] ) == "string" )    
+                        if ( typeof( item[3] ) == "string" )
                             newItem.label = item[ 3 ];
-                        else
-                            newItem.bus = 1;
+                        else if ( item[ 3 ] == -1 ) {
+                            newItem.reverse = 1;
+                        } else
+                            if ( item[3 ] == 1 )
+                                newItem.bus = 1;
+                    }
+                    if ( item[ 4 ] ) {
+                        if ( typeof( item[4] ) == "string" )
+                            newItem.label = item[ 4 ];
+                        else if ( item[ 4 ] == -1 ) {
+                            newItem.reverse = 1;
+                            // flip the source and target
+                        } else
+                            if ( item[ 4 ] == 1 )
+                                newItem.bus = 1;
                     }
                     item = newItem;
                 }
@@ -388,6 +426,11 @@ var hdelk = (function(){
                 if ( ( !item.sources || !item.targets ) && item.route ) {
                     item.sources = [ item.route[ 0 ] ];
                     item.targets = [ item.route[ 1 ] ];
+                }
+                if ( item.reverse ) {
+                    var s = item.sources;
+                    item.sources = item.targets;
+                    item.targets = s;
                 }
                 if ( !item.labels && item.label ) {
                     item.labels = [ { text:item.label } ];
@@ -425,6 +468,10 @@ var hdelk = (function(){
      * @returns {string} svg
      */
     var diagram = function( div_id, diagram_layout ) {
+
+        var diagramElement = document.getElementById(div_id);
+        diagramElement.innerHTML = "";
+
         var draw = SVG(div_id).size( diagram_layout.width, diagram_layout.height );
 
         node( draw, diagram_layout, 0, 0 );
@@ -522,7 +569,7 @@ var hdelk = (function(){
                 var portTextItem = group.text(portText).style("font-size:"+port_name_font_size).fill({color:nameColor});
                 var portTextWidth = portTextItem.node.getComputedTextLength();
 
-                
+
                 if ( item.vertical ) {
                     //group.rect(item.width, item.height).move(offsetX + child.x+item.x,offsetY + child.y+item.y)
                     //                                   .attr({ fill:childColor, 'stroke-width': node_stroke_width, stroke:portColor })
@@ -605,8 +652,12 @@ var hdelk = (function(){
                 }
 
                 var terminatorWidth_2 = width;
-                if ( terminatorWidth_2 < 3 ) terminatorWidth_2 = 3;
-                group.rect( terminatorWidth_2 * 2, terminatorWidth_2 * 2).attr({ fill:color }).move(offsetX + endPoint.x - terminatorWidth_2, offsetY + endPoint.y - terminatorWidth_2 );
+                if ( terminatorWidth_2 < 3 )
+                    terminatorWidth_2 = 3;
+                if ( edge.reverse )
+                    group.rect( terminatorWidth_2 * 2, terminatorWidth_2 * 2).attr({ fill:color }).move(offsetX + startPoint.x - terminatorWidth_2, offsetY + startPoint.y - terminatorWidth_2 );
+                else
+                    group.rect( terminatorWidth_2 * 2, terminatorWidth_2 * 2).attr({ fill:color }).move(offsetX + endPoint.x - terminatorWidth_2, offsetY + endPoint.y - terminatorWidth_2 );
 
             } );
         }

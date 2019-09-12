@@ -16,7 +16,7 @@ header:
 
 The purpose of this document is to motivate and describe a proposal that might promote more reuse in the world of small FPGA IP design. The target audience will be people who are familiar with Verilog, and who are interested in developing ways to better connect IP.
 
-In a sense what follows is all rather known or obvious, and there is little new innovation presented, but that really underscores how strange it is that we don't have a huge range of compatible libraries of functionality to play with as FPGA engineers. 
+In a sense what follows is all rather known or obvious, and there is little new innovation presented, but that really underscores how strange it is that we don't have a huge range of compatible libraries of functionality to play with as FPGA engineers.
 
 An [Overview](#overview) of the problem is outlined initially, followed by a [Motivation](#motivation) section with a few "wouldn't it be nice" examples. The [Design](#design) section goes through the creation of a systematic pipeline and finally, in [Implementation](#implementation) there are some proposals for how pipleines might be implemented.
 
@@ -34,14 +34,14 @@ What are some of the causes of the lack of rich compatible, composable, librarie
 - lack of a connecting component tradition.   Designs don't seem to emphasize generic interconnection as a priority.
 - ASIC designers may have a "one and done" orientation.  Designs are very focussed on a single target product, not sharable libraries, and when a design has sucessfully made it into silicon there is very little incentive to reuse that IP other than within the same team.
 - the HDL world is split into Verilog and VHDL meaning that much code is "in the wrong language"
-- the very low level HDL operates at means implementation strategies can vary widely, being appealing to some and not to others.  
+- the very low level HDL operates at means implementation strategies can vary widely, being appealing to some and not to others.
 - sometimes the code is designed to be put on a processor bus, sometimes not.
 - comprehensive interfaces are long winded.  It is frustrating to wire everything up laboriously.  Verilog is especially bad since there are no structures in that language.
 - one especially vexing situation is when high quality layers are built on top of HDL, for example **System Verilog** and **MiGen**, but this further fragments things!  Incredible libraries exist for these other languages, but of course you have to be using them to use the libraries.  And worse, in some cases you can't use basic Verilog/VHDL modules either!
 
 The effect of all this is that new FPGA engineers tend to avoid low level coding all together, the mode of programming FPGAs becomes more and more connecting cores to a bus and connecting directly or indirectly to a processor and writing C code for it.  This is sad, since some of the excitement of incredibly fast interconnected FPGA IP is lost through relatively slow code execution and increased FPGA system complexity.  It also means that there is pressure to use bigger and bigger FPGA's, since larger LUT counts mean more efficient soft CPUs (more pipelining) and larger code space.  Larger FPGAs are more expensive, boards they sit on are harder to design and more expensive, and larger images are slower to build.
 
-New FPGA developers get some idea of how things work by programming a blinking LED (without library help!), but almost immediately the next step is soft CPU, IP with Wishbone interfaces, C compilers and C code.  
+New FPGA developers get some idea of how things work by programming a blinking LED (without library help!), but almost immediately the next step is soft CPU, IP with Wishbone interfaces, C compilers and C code.
 
 Another effect of a lack of library behavior is that even companies providing FPGA add-on hardware often don't provide low level HDL to use the devices, preferring instead offer nothing at all or generic bus interfaces.
 
@@ -53,7 +53,7 @@ Pretending for a minute that the above problems did not exist, and that we had a
 
 ### USB Echo
 
-A simple character echo would have been so reassuring for a first timer.  
+A simple character echo would have been so reassuring for a first timer.
 
 <div id="host_echo"></div>
 
@@ -92,7 +92,7 @@ The `USB CDC` module is generic and reusable.  Note how thinking about it as a p
 
 ### Function Tester
 
-While first learning, wouldn't it have been great to be able to write a math module and then test it in real hardware with a terminal program?  
+While first learning, wouldn't it have been great to be able to write a math module and then test it in real hardware with a terminal program?
 
 <div id="hello_function_tester"></div>
 
@@ -120,12 +120,12 @@ While first learning, wouldn't it have been great to be able to write a math mod
                 ],
                 edges: [
                     ["usb_s.out","param1.in" ],
-                    ["param1.out","param2.in" ], 
-                    ["param1.int","f.a" ], 
-                    ["param2.int","f.b" ], 
-                    ["f.c","return.int" ], 
-                    ["return.out","unique.in" ], 
-                    ["unique.out","usb_s.in" ], 
+                    ["param1.out","param2.in" ],
+                    ["param1.int","f.a" ],
+                    ["param2.int","f.b" ],
+                    ["f.c","return.int" ],
+                    ["return.out","unique.in" ],
+                    ["unique.out","usb_s.in", -1 ],
                     ["FPGA.usb","usb_s.usb" ]
                 ] }
         ],
@@ -173,9 +173,9 @@ It would have been nice to be able to run some message passing code on the host,
                 ],
                 edges: [
                     ["FPGA.usb","usb_s.usb" ],
-                    ["Internals.out","escape.in"], 
-                    ["escape.out","usb_s.in"], 
-                    ["usb_s.out","unescape.in"], 
+                    ["Internals.out","escape.in"],
+                    ["escape.out","usb_s.in"],
+                    ["usb_s.out","unescape.in"],
                     ["unescape.out","Internals.in"]
                 ] }
         ],
@@ -189,7 +189,7 @@ It would have been nice to be able to run some message passing code on the host,
 
 `escape` would turn the pipelines' `start` and `stop` packet delimiting signals into escape sequences, and `unescape` would do the opposite.  This would make sending messages over an 8bit line more convenient.
 
-Again, the only code that would need to be written in this case is the highlighted code : the app code on the host and the Verilog internal code on the FPGA. 
+Again, the only code that would need to be written in this case is the highlighted code : the app code on the host and the Verilog internal code on the FPGA.
 
 Let's use the following shorthand for this kind of host communication:
 
@@ -207,9 +207,9 @@ Let's use the following shorthand for this kind of host communication:
                     { id: "Internals", type:"Verilog", inPorts:["in"], outPorts:[ "out" ], highlight:1  }
                 ],
                 edges: [
-                    ["Internals.out","to_host"], 
+                    ["Internals.out","to_host"],
                     ["from_host","Internals.in"]
-                ] 
+                ]
             }
         ]
     }
@@ -221,7 +221,7 @@ The `to Host` and `from Host` ports will be assumed to take and provide messages
 
 ### FPGA Comms
 
-FPGA pins can trivially toggle at hundreds of metahetz, so why aren't there off-the-shelf, architecture independent modules to create fast, reliable message communication? 
+FPGA pins can trivially toggle at hundreds of metahetz, so why aren't there off-the-shelf, architecture independent modules to create fast, reliable message communication?
 
 <div id="fpga_comms"></div>
 
@@ -239,24 +239,24 @@ FPGA pins can trivially toggle at hundreds of metahetz, so why aren't there off-
                     { id: "i1", label:"Internals", type:"Verilog", ports:[ "in","out" ], highlight:1  }
                 ],
                 edges: [
-                    //["i1.out","to_host"], 
+                    //["i1.out","to_host"],
                     //["from_host","i1.in"],
                     ["i1.out","c1.in"],
                     ["c1.out","i1.in"],
                     ["c1.link","FPGA1.link"]
-                ] 
+                ]
             },
             { id: "FPGA2",
                 westPorts:[ "link" ],
                 children: [
-                    { id:"c2", label: "comms", ports:["out","in"], westPorts:["link"]},
-                    { id:"i2", label:"Internals", type:"Verilog", ports:[ "in","out" ], highlight:1  }
+                    { id:"c2", label: "comms", inPorts:["link"], outPorts:["in", "out"]},
+                    { id:"i2", label:"Internals", type:"Verilog", westPorts:[ "in","out" ], highlight:1  }
                 ],
                 edges: [
-                    ["i2.out","c2.in"],
+                    ["i2.out","c2.in", -1],
                     ["c2.out","i2.in"],
                     ["FPGA2.link","c2.link"]
-                ] 
+                ]
             }
         ],
         edges:[
@@ -290,13 +290,13 @@ A small extension to the `comms` module would allow a ring network to be created
                     { id: "i1", label:"Internals", type:"Verilog", ports:[ "h_in","h_out"], southPorts:[ "in","out" ], highlight:1  }
                 ],
                 edges: [
-                    ["i1.h_out","to_host"], 
+                    ["i1.h_out","to_host"],
                     ["from_host","i1.h_in"],
                     ["i1.out","n1.in"],
                     ["n1.out","i1.in"],
                     ["FPGA1.net_in","n1.net_in"],
                     ["n1.net_out","FPGA1.net_out"]
-                ] 
+                ]
             },
             { id: "FPGA2",
                 westPorts:[ "net_in" ],
@@ -306,11 +306,11 @@ A small extension to the `comms` module would allow a ring network to be created
                     { id:"i2", label:"Internals", type:"Verilog", northPorts:[ "in","out" ], highlight:1  }
                 ],
                 edges: [
-                    ["i2.out","n2.in"],
+                    ["i2.out","n2.in", -1],
                     ["n2.out","i2.in"],
                     ["FPGA2.net_in","n2.net_in"],
                     ["n2.net_out","FPGA2.net_out"]
-                ] 
+                ]
             },
             { id: "FPGA3",
                 westPorts:[ "net_in" ],
@@ -320,18 +320,18 @@ A small extension to the `comms` module would allow a ring network to be created
                     { id:"i3", label:"Internals", type:"Verilog", northPorts:[ "in","out" ], highlight:1  }
                 ],
                 edges: [
-                    ["i3.out","n3.in"],
+                    ["i3.out","n3.in", -1],
                     ["n3.out","i3.in"],
                     ["FPGA3.net_in","n3.net_in"],
                     ["n3.net_out","FPGA3.net_out"]
-                ] 
+                ]
             }
 
         ],
         edges:[
             ["FPGA1.net_out","FPGA2.net_in"],
             ["FPGA2.net_out","FPGA3.net_in"],
-            ["FPGA3.net_out","FPGA1.net_in"]
+            ["FPGA3.net_out","FPGA1.net_in", -1]
         ]
     }
 
@@ -366,8 +366,8 @@ There are so many incredible SPI chips.  Wouldn't it have been great if it were 
                 ],
                 edges: [
                     ["FPGA.usb","usb_m.usb" ],
-                    ["spi.out","usb_m.in"], 
-                    ["usb_m.out","spi.in"], 
+                    ["spi.out","usb_m.in", -1],
+                    ["usb_m.out","spi.in"],
                     ["spi.spi","FPGA.spi"]
                 ] },
             { id: "s", label:"SPI Device", inPorts: [ "spi" ] }
@@ -383,9 +383,9 @@ There are so many incredible SPI chips.  Wouldn't it have been great if it were 
 
 The `spi master` accepts messages and puts their content out to the SPI bus.  Received data is returned.
 
-Of particular interest here is that *no functional code is written for the FPGA at all*.  All the functionality is provided by reusable library modules. 
+Of particular interest here is that *no functional code is written for the FPGA at all*.  All the functionality is provided by reusable library modules.
 
-### SPI Devices 
+### SPI Devices
 
 Could we go further?  Take an IMU as an example - wouldn't it have been great if it were possible to wrap the `spi master` module with code that handles the IMU's initialization and interface requirements and then just get IMU data out of it?
 
@@ -402,9 +402,9 @@ Could we go further?  Take an IMU as an example - wouldn't it have been great if
                     { id: "imu", label:"imu spi", northPorts:["accel","rot","mag" ], eastPorts:["spi"]  }
                 ],
                 edges: [
-                    ["imu.accel","i.accel"], 
-                    ["imu.rot","i.rot"], 
-                    ["imu.mag","i.mag"], 
+                    ["imu.accel","i.accel", -1],
+                    ["imu.rot","i.rot", -1],
+                    ["imu.mag","i.mag", -1],
                     ["imu.spi","FPGA.spi"]
                 ] },
             { id: "i", label:"IMU Device", inPorts: [ "spi" ] }
@@ -445,7 +445,7 @@ Things that are often specific to a particular FPGA family could be wrapped up p
 - Clock PLLs
 - FPGA internals
 
-Finally various *combinations* of pipeline components could be put together to make even more interesting functionality.  The new modules so formed would themselves be pipeline modules, reusable, and with all the other desirable pipeline characteristics. 
+Finally various *combinations* of pipeline components could be put together to make even more interesting functionality.  The new modules so formed would themselves be pipeline modules, reusable, and with all the other desirable pipeline characteristics.
 
 The hope in providing so many examples is to build the case for a Pipelining approach.  But is it even feasible and convenient to express these ideas in FPGAs?  Let's now turn to how we might do that.
 
@@ -453,9 +453,9 @@ The hope in providing so many examples is to build the case for a Pipelining app
 
 How to design a flexible pipelining system?  If you're intimately familiar with **Valid-Ready** interfaces you might like to skip ahead to the [Start + Stop](#start--stop) section.
 
-### Data 
+### Data
 
-When one module needs to speak to another there is one thing that must be shared, the data, what ever that is.  We'll call the data sender the **Producer** and the receiver the **Consumer** 
+When one module needs to speak to another there is one thing that must be shared, the data, what ever that is.  We'll call the data sender the **Producer** and the receiver the **Consumer**
 
 <div id="pipe_data"></div>
 
@@ -485,7 +485,7 @@ But when is this data actually available?
   ], config:{skin:"lowkey"} }
 </script>
 
-After a reset it might take a while for data to be valid, more might turn up, but then there may nothing for a while, then more data could become available, etc.  Think about a UART, for example.  Every now and again a character just appears! 
+After a reset it might take a while for data to be valid, more might turn up, but then there may nothing for a while, then more data could become available, etc.  Think about a UART, for example.  Every now and again a character just appears!
 
 ### Valid
 
@@ -537,7 +537,7 @@ However, there is another problem here.  What if the Consumer is not ready?  It 
         edges: [
             { route:["p1.out_data","p2.in_data"], bus:1 },
             ["p1.out_valid","p2.in_valid"],
-            ["p2.in_ready","p1.out_ready"] 
+            ["p2.in_ready","p1.out_ready"]
         ]
     }
 
@@ -552,7 +552,7 @@ The 'ready' signal is raised when the Consumer is ready to receive data.  `Ready
    { name: 'p1.out_data',  wave: 'x.2x2x.4..x', data:'d1 d2 d3'},
    { name: 'p1.out_valid', wave: '0.1010.1..0' },
    { name: 'p2.in_ready', wave: '01....0..1.' }
-  ], 
+  ],
   head:{ tock:1 },
   config:{skin:"lowkey"} }
 </script>
@@ -593,7 +593,7 @@ On the consumer side, when you're in a consumer-ready sort of state, you'll sit 
 ...
 ```
 
-One of the great things about the Ready-Valid connection is that if both `ready` and `valid` are held high, transfers occur *every clock cycle*.  To someone used to laboriously reading or toggling data from one place to another, this is pretty exciting.  
+One of the great things about the Ready-Valid connection is that if both `ready` and `valid` are held high, transfers occur *every clock cycle*.  To someone used to laboriously reading or toggling data from one place to another, this is pretty exciting.
 
 <script type="WaveDrom">
 { signal: [
@@ -601,7 +601,7 @@ One of the great things about the Ready-Valid connection is that if both `ready`
    { name: 'data',  wave: 'x.2222222x.', data:'d1 d2 d3 d4 d5 d6 d7'},
    { name: 'valid', wave: '0.1......0.' },
    { name: 'ready', wave: '01.........' }
-  ], 
+  ],
   config:{skin:"lowkey"} }
 </script>
 
@@ -627,14 +627,14 @@ Very often sequential data items in a pipeline are parts of multiword **Packets*
             ["p1.out_stop","p2.in_stop"],
             { route:["p1.out_data","p2.in_data"], bus:1 },
             ["p1.out_valid","p2.in_valid"],
-            ["p2.in_ready","p1.out_ready"] 
+            ["p2.in_ready","p1.out_ready"]
         ]
     }
 
     hdelk.layout( graph, "pipe_packets" );
 </script>
 
-Not surprisingly, the `start` and `stop` signals mark the words that begin and end the packet. 
+Not surprisingly, the `start` and `stop` signals mark the words that begin and end the packet.
 
 <script type="WaveDrom">
 { signal: [
@@ -644,11 +644,11 @@ Not surprisingly, the `start` and `stop` signals mark the words that begin and e
    { name: 'data',  wave: 'x.3222223x.', data:'d1 d2 d3 d4 d5 d6 d7'},
    { name: 'valid', wave: '0.1......0.' },
    { name: 'ready', wave: '01.........' }
-  ], 
+  ],
   config:{skin:"lowkey"} }
 </script>
 
-With this scheme is is possible to have one word packets, but not zero word packets, since there is always a word alongside the `start` and `stop` flags.  
+With this scheme is is possible to have one word packets, but not zero word packets, since there is always a word alongside the `start` and `stop` flags.
 
 <script type="WaveDrom">
 { signal: [
@@ -658,7 +658,7 @@ With this scheme is is possible to have one word packets, but not zero word pack
    { name: 'data',  wave: 'x..3x...', data:'d1'},
    { name: 'valid', wave: '0..10...' },
    { name: 'ready', wave: '01......' }
-  ], 
+  ],
   config:{skin:"lowkey"} }
 </script>
 
@@ -666,7 +666,7 @@ Buses sometimes omit the `start` signal, and have a `stop` signal only (often ca
 
 ### Data Size
 
-Often, and especially with larger data fields, it is useful to be able to specify how much of the data field is being used.  This is a count in bits.  
+Often, and especially with larger data fields, it is useful to be able to specify how much of the data field is being used.  This is a count in bits.
 
 <div id="pipe_data_size"></div>
 
@@ -683,14 +683,14 @@ Often, and especially with larger data fields, it is useful to be able to specif
             { route:["p1.out_data_size","p2.in_data_size"], bus:1 },
             { route:["p1.out_data","p2.in_data"], bus:1 },
             ["p1.out_valid","p2.in_valid"],
-            ["p2.in_ready","p1.out_ready"] 
+            ["p2.in_ready","p1.out_ready"]
         ]
     }
 
     hdelk.layout( graph, "pipe_data_size" );
 </script>
 
-This is especially useful when converting from serial pipelines to parallel ones and vice versa.  Since all pipelines are fixed width, this permits packets of less than the full size of the parallel data field to be transfered. 
+This is especially useful when converting from serial pipelines to parallel ones and vice versa.  Since all pipelines are fixed width, this permits packets of less than the full size of the parallel data field to be transfered.
 
 Let's imagine that we have such a pipeline:
 
@@ -701,7 +701,7 @@ Let's imagine that we have such a pipeline:
     var graph = {
         children: [
             { id: "p1", type:"Serial", outPorts: ["out_start", "out_stop", "out_data", "out_valid", "out_ready"] },
-            { id: "p2", type:"pipe_parallelize", inPorts: [ "in_start", "in_stop", "in_data", "in_valid", "in_ready"], 
+            { id: "p2", type:"pipe_parallelize", inPorts: [ "in_start", "in_stop", "in_data", "in_valid", "in_ready"],
                                         outPorts: [ "out_data_size", "out_data", "out_valid", "out_ready"] },
             { id: "p3", type:"Parallel", inPorts: [ "in_data_size", "in_data", "in_valid", "in_ready"] }
         ],
@@ -736,7 +736,7 @@ In this setup, there is a module `p1` that produces packets of data delineated w
    { name: 'p2.data',      wave: 'x........3x', data:'d1-7'},
    { name: 'p2.valid',     wave: '0........10' },
    { name: 'p2.ready',     wave: '01.........' }
-  ], 
+  ],
   config:{skin:"lowkey"} }
 </script>
 
@@ -751,13 +751,13 @@ The `data_size` field can also solve the "can't make an empty packet" problem by
    { name: 'data',       wave: 'x..2x.......', data:'d1'},
    { name: 'valid',      wave: '0..10..10...' },
    { name: 'ready',      wave: '01..........' }
-  ], 
+  ],
   config:{skin:"lowkey"} }
 </script>
 
 ### Payload
 
-Collectively, all the non-handshaking fields make up the **Payload**.  
+Collectively, all the non-handshaking fields make up the **Payload**.
 
 <script type="WaveDrom">
 { signal: [
@@ -777,7 +777,7 @@ Collectively, all the non-handshaking fields make up the **Payload**.
 
 Tools exist (as you'll see below) to manipulate the whole payload at once.
 
-This is very handy for modules that don't much care what the various fields are, they just want to do something correctly, transparently with the entire payload.  Like a fifo, or many communication modules.  
+This is very handy for modules that don't much care what the various fields are, they just want to do something correctly, transparently with the entire payload.  Like a fifo, or many communication modules.
 
 ## Implementation
 
@@ -792,7 +792,7 @@ The last module diagram was a bit of an eye-full and the textual Verilog needed 
     var graph = {
         children: [
             { id: "p1", type:"Serial", outPorts: ["out_start", "out_stop", "out_data", "out_valid", "out_ready"] },
-            { id: "p2", type:"pipe_parallelize", inPorts: [ "in_start", "in_stop", "in_data", "in_valid", "in_ready"], 
+            { id: "p2", type:"pipe_parallelize", inPorts: [ "in_start", "in_stop", "in_data", "in_valid", "in_ready"],
                                         outPorts: [ "out_data_size", "out_data", "out_valid", "out_ready"] },
             { id: "p3", type:"Parallel", inPorts: [ "in_data_size", "in_data", "in_valid", "in_ready"] }
         ],
@@ -822,7 +822,7 @@ Visually many tools let you make short cuts in these circumstances.  The diagram
     var graph = {
         children: [
             { id: "p1", type:"Serial", outPorts: ["out_pipe"] },
-            { id: "p2", type:"pipe_parallelize", inPorts: [ "in_pipe"], 
+            { id: "p2", type:"pipe_parallelize", inPorts: [ "in_pipe"],
                                         outPorts: [ "out_pipe" ] },
             { id: "p3", type:"Parallel", inPorts: [ "in_pipe"] }
         ],
@@ -839,7 +839,7 @@ So much better!  The thicker lines indicate that what is being transfered is a b
 
 ### Pipe Specifications
 
-How can we help ourselves in code too?  In almost any other language a data structure would be the natural way to handle this situation.  Put all the fields into a structure and pass it around as one unified object.  The compiler might even type check it for us if we're so lucky.  The (very) bad news is that Verilog does not permit structures.  They are one of the benefits of System Verilog, but questions about uniform support for System Verilog in Vendor and OSS tools results in smirks and head shakes. 
+How can we help ourselves in code too?  In almost any other language a data structure would be the natural way to handle this situation.  Put all the fields into a structure and pass it around as one unified object.  The compiler might even type check it for us if we're so lucky.  The (very) bad news is that Verilog does not permit structures.  They are one of the benefits of System Verilog, but questions about uniform support for System Verilog in Vendor and OSS tools results in smirks and head shakes.
 
 So what can we do in Verilog itself?  The one thing Verilog does allow is arrays of wires, so could we try to do that?
 
@@ -902,7 +902,7 @@ To use them we include a header *before* our module declaration.  It needs to be
 `include "../../pipe/rtl/pipe_predefs.v"
 ```
 
-First we need a way to specify the Pipes we're using.  If this were just a single value, that would be great.  Let's try to pack the various configuration options into a single 32bit value called a **PipeSpec**.  This value will only be used during synthesis, and will not make it into our designs unless we explicitly use it. 
+First we need a way to specify the Pipes we're using.  If this were just a single value, that would be great.  Let's try to pack the various configuration options into a single 32bit value called a **PipeSpec**.  This value will only be used during synthesis, and will not make it into our designs unless we explicitly use it.
 
 **PipeSpec**
 <script type="WaveDrom">
@@ -921,9 +921,9 @@ reg:[
 This is not the bundle of wires we're passing around as our pipe, it's a single 32b value encoding *what's in our pipe*.  With a lot of room for growth.
 Note that there is no mention of `ready_valid` since these signals must be present in all pipes.
 
-There is a shorthand for these PipeSpecs: not all combinations are defined but the pattern is 
+There is a shorthand for these PipeSpecs: not all combinations are defined but the pattern is
 
-**`PS_** + **d** + data_size + *[optionally]* **s** + *[optionally]* **z**  
+**`PS_** + **d** + data_size + *[optionally]* **s** + *[optionally]* **z**
 
 - **d**n means data size n
 - **s** means start and stop bits
@@ -945,7 +945,7 @@ reg:[
 }
 </script>
 
-The PipeSpec for a pipe with 8 bits of data, and no other features is just 
+The PipeSpec for a pipe with 8 bits of data, and no other features is just
 
 ``` verilog
 8
@@ -975,13 +975,13 @@ reg:[
 }
 </script>
 
-The PipeSpec is 
+The PipeSpec is
 
 ``` verilog
 8 | `PS_START_STOP
 ```
 
-where PS_START_STOP is defined as 
+where PS_START_STOP is defined as
 
 ``` verilog
 (1<<`PS_START_STOP_BIT)
@@ -1008,13 +1008,13 @@ reg:[
 }
 </script>
 
-The PipeSpec for a pipe with 64 bits of data, start stop and data size is  
+The PipeSpec for a pipe with 64 bits of data, start stop and data size is
 
 ``` verilog
 64 | `PS_START_STOP_BIT | `PS_DATA_SIZE
 ```
 
-where PS_DATA_SIZE is defined as 
+where PS_DATA_SIZE is defined as
 
 ``` verilog
 (1<<`PS_DATA_SIZE_BIT)
@@ -1024,7 +1024,7 @@ where PS_DATA_SIZE is defined as
 
 Now we can specify pipes in a single integer, we can add *more macros* to do things for us.  For a start, and most importantly, we can do what we set out to do earlier, we can calculate Pipe widths!
 
-The macro 
+The macro
 
 ``` verilog
 `P_w( PipeSpec )
@@ -1066,20 +1066,20 @@ Where are we?  Here's how connecting modules together by pipe used to look:
 
     producer #( .DataSize( DataSize ) ) p (
             ...
-            .out_start( xfer_start ), 
-            .out_stop( xfer_stop ), 
-            .out_data( xfer_data ), 
-            .out_valid( xfer_valid ), 
-            .out_ready( xfer_ready ), 
+            .out_start( xfer_start ),
+            .out_stop( xfer_stop ),
+            .out_data( xfer_data ),
+            .out_valid( xfer_valid ),
+            .out_ready( xfer_ready ),
             ...
         );
-    consumer #( .DataSize( DataSize ) ) c ( 
-            ... 
-            .in_start( xfer_start ), 
-            .in_stop( xfer_stop ), 
-            .in_data( xfer_data ), 
-            .in_valid( xfer_valid ), 
-            .in_ready( xfer_ready ), 
+    consumer #( .DataSize( DataSize ) ) c (
+            ...
+            .in_start( xfer_start ),
+            .in_stop( xfer_stop ),
+            .in_data( xfer_data ),
+            .in_valid( xfer_valid ),
+            .in_ready( xfer_ready ),
             ...
         );
 
@@ -1097,14 +1097,14 @@ Fortunately, having all the present and future features of pipes being passed ar
 
     wire [P_w(XferPipeSpec)-1:0] xferPipe;
 
-    producer #( .PipeSpec( XferPipeSpec ) ) p ( 
-            ... 
-            .out_pipe( xferPipe ) 
+    producer #( .PipeSpec( XferPipeSpec ) ) p (
+            ...
+            .out_pipe( xferPipe )
             ...
         );
-    consumer #( .PipeSpec( XferPipeSpec ) ) c ( 
-            ... 
-            .in_pipe( xferPipe ) 
+    consumer #( .PipeSpec( XferPipeSpec ) ) c (
+            ...
+            .in_pipe( xferPipe )
             ...
         );
 
@@ -1133,7 +1133,7 @@ Here are the PipeSpec shorthand macros we can use:
 `define PS `PS_d8s
 ```
 
-Here are the Macros for calculating widths.  Note that if the field is not present, the width is 0.  
+Here are the Macros for calculating widths.  Note that if the field is not present, the width is 0.
 
 ``` verilog
 `define P_Data_w( spec )     ( ( spec ) & `PS_DATA )
@@ -1159,9 +1159,9 @@ It's just the width of the whole pipe less the two handshake signals.
 
 Turning our attention from module *use* to module *creation*, how are we going to get the data out of these packed arrays?  This time tiny sub modules are the way to go.  Instead of having to do elaborate bit location calculations there are module helpers.
 
-Declare the data values you need, and then instanciate the helper to pack or unpack the pipe field you want.  A great part of this story is that these packing and unpacking functions will work even if the fields are not there in the PipeSpec.  For example unpacking Start and Stop fields from a pipe that according to the PipeSpec doesn't have them results in registers being defined that are always 0.  Similarly attempting to pack Start and Stop fields into a pipe that doesn't have them just silently doesn't do it.  This cuts down on conditional code in the rest of the module. 
+Declare the data values you need, and then instanciate the helper to pack or unpack the pipe field you want.  A great part of this story is that these packing and unpacking functions will work even if the fields are not there in the PipeSpec.  For example unpacking Start and Stop fields from a pipe that according to the PipeSpec doesn't have them results in registers being defined that are always 0.  Similarly attempting to pack Start and Stop fields into a pipe that doesn't have them just silently doesn't do it.  This cuts down on conditional code in the rest of the module.
 
-The best part of the pipe packer and unpacker story is that these modules are mostly just helpers.  They add almost nothing to the final design. 
+The best part of the pipe packer and unpacker story is that these modules are mostly just helpers.  They add almost nothing to the final design.
 
 What is this going to look like?
 
@@ -1182,7 +1182,7 @@ What is this going to look like?
                     ["Internals.out_stop","p1p1.out_stop"],
                     { route:["Internals.out_data","p1p1.out_data"], bus:1 },
                     ["Internals.out_valid","p1p1.out_valid"],
-                    ["p1p1.out_ready","Internals.out_ready"] 
+                    ["p1p1.out_ready","Internals.out_ready"]
                 ]
              },
             { id: "p2", type:"Consumer", inPorts: [ "in_pipe"],
@@ -1196,7 +1196,7 @@ What is this going to look like?
                     ["p2p1.in_stop","Internals.in_stop"],
                     { route:["p2p1.in_data","Internals.in_data"], bus:1 },
                     ["p2p1.in_valid","Internals.in_valid"],
-                    ["Internals.in_ready","p2p1.in_ready"] 
+                    ["Internals.in_ready","p2p1.in_ready"]
                 ] }
         ],
         edges: [
@@ -1241,7 +1241,7 @@ endmodule
 ```
 Here, as required, the separate signals that are used internal to the module are bundled by helper submodules into a single array, `out_pipe` for routing outside.
 
-Note that the default PipeSpec (PS_d8) has no Start Stop flags, but the code can still work with them if they're there.  The code can assign to them but there is no further effect. 
+Note that the default PipeSpec (PS_d8) has no Start Stop flags, but the code can still work with them if they're there.  The code can assign to them but there is no further effect.
 
 Here's what a consumer looks like:
 
@@ -1275,7 +1275,7 @@ endmodule
 ```
 Similarly, as required, the single `in_pipe` array from outside is unbundled by helper submodules into separate signals to be used internal to the module.
 
-Note again that the default PipeSpec (PS_d8) has no Start Stop flags, but the code can still work with them if they're there. They will appear as always off wires to the synthesizer. 
+Note again that the default PipeSpec (PS_d8) has no Start Stop flags, but the code can still work with them if they're there. They will appear as always off wires to the synthesizer.
 
 ### Pipe Helper Module Summary
 
@@ -1438,7 +1438,7 @@ There is the ugly possibility that the middle module-in-a-chain, while receiving
    { name: 'p2.out_data',  wave: 'x..2224.222x.', data:'d1 d2 d3 d4 d5 d6 d7'},
    { name: 'p2.out_valid', wave: '0..1.......0.' },
    { name: 'p3.in_ready', wave: '0.1...01.....' }
-  ], 
+  ],
   head:{ tock:1 },
   config:{skin:"lowkey"} }
 </script>
@@ -1449,26 +1449,26 @@ Let's see what's happening in this train wreck.  The trouble starts at Cycle 7 w
 |   - | - | - | - |
 |  <3 | Ready, No Data | Ready, No Data |
 |   3 | **d1** transfered | Ready, No Data |
-|   4 | **d2** transfered | **d1** transfered | 
-|   5 | **d3** transfered | **d2** transfered | 
-|   6 | **d4** transfered | **d3** transfered | 
-|   7 | **d5** transfered | **d4** waiting, **p3** *not ready*, nothing transfered | 
-|   8 | **d6** waiting, **p2** *not ready*, **d5** stored in overflow | **d4** transfered, **p3** *ready again* | 
-|   9 | **d6** transfered, **p2** *ready again*, overflow cleared | **d5** transfered | 
-|  10 | **d7** transfered | **d6** transfered | 
-|  11 | Ready, No Data  | **d7** transfered | 
+|   4 | **d2** transfered | **d1** transfered |
+|   5 | **d3** transfered | **d2** transfered |
+|   6 | **d4** transfered | **d3** transfered |
+|   7 | **d5** transfered | **d4** waiting, **p3** *not ready*, nothing transfered |
+|   8 | **d6** waiting, **p2** *not ready*, **d5** stored in overflow | **d4** transfered, **p3** *ready again* |
+|   9 | **d6** transfered, **p2** *ready again*, overflow cleared | **d5** transfered |
+|  10 | **d7** transfered | **d6** transfered |
+|  11 | Ready, No Data  | **d7** transfered |
 | >11 | Ready, No Data | Ready, No Data |
 
 The consequences of the hold-up propagate back up through the pipeline, one module per cycle.
 
-Codewise, this isn't too dire for a Producer or Consumer.  They just wait for conditions to be right again for transfers.  Any module in the middle, dealing with both its commitments downstream and upstream, however has to have provisions for stalling. And unstalling.  It can be quite a mind-bender.  
+Codewise, this isn't too dire for a Producer or Consumer.  They just wait for conditions to be right again for transfers.  Any module in the middle, dealing with both its commitments downstream and upstream, however has to have provisions for stalling. And unstalling.  It can be quite a mind-bender.
 
 Codewise, pipeline modules with pipes in and out will have states much like the following:
 
 - **STATE_STARVING** - we are ready for `in_data` (`in_ready` is high), but the upstream module doesn't have any (`in_valid` was low), there may be `out_data` until `out_ready` when we set `out_valid` to false.
 - **STATE_TRANSFERING** - we are ready for data (`in_ready` is high), there was valid `in_data`, out `out_ready` was asserted by the downstream module, if all is well, we transfer the data to `out_data` and `out_valid` is asserted.
-- **STATE_STALLED** - we are not ready for new data (`in_ready` was low.  And we have `out_data` (`out_valid` is true), but the downstream module was not ready (`out_ready` was low). 
-- **STATE_OVERFLOWED** - we are not ready for `in_data`, since we're full up.  We have data in `data_overflow`.  The downstream module was not ready (`out_ready` was low).  We have `out_data` waiting to be transfered and `out_valid` asserted. 
+- **STATE_STALLED** - we are not ready for new data (`in_ready` was low.  And we have `out_data` (`out_valid` is true), but the downstream module was not ready (`out_ready` was low).
+- **STATE_OVERFLOWED** - we are not ready for `in_data`, since we're full up.  We have data in `data_overflow`.  The downstream module was not ready (`out_ready` was low).  We have `out_data` waiting to be transfered and `out_valid` asserted.
 
 It can (did) take many weeks of sober contemplation to get this all straight.
 
