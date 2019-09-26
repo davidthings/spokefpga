@@ -6,40 +6,219 @@ toc: true
 toc_label: Contents
 toc_sticky: true
 wavedrom : 1
+# codemirror: 1
 # threejs: 1
 header:
   title: Pipelines
   overlay_image: /assets/images/spokefpga_banner_thin.png
 ---
 
-## Introduction
-
-The purpose of this document is to motivate and describe a proposal that might promote more reuse in the world of small FPGA IP design. The target audience will be people who are familiar with Verilog, and who are interested in developing ways to better connect IP.
-
-In a sense what follows is all rather known or obvious, and there is little new innovation presented, but that really underscores how strange it is that we don't have a huge range of compatible libraries of functionality to play with as FPGA engineers.
-
-An [Overview](#overview) of the problem is outlined initially, followed by a [Motivation](#motivation) section with a few "wouldn't it be nice" examples. The [Design](#design) section goes through the creation of a systematic pipeline and finally, in [Implementation](#implementation) there are some proposals for how pipleines might be implemented.
+<!-- // this is up here because for some reason WaveDrom doesn't like doing registers before waves -->
+<script type="WaveDrom"> { signal: [ ] } </script>
 
 ## Overview
 
+This section is a quick overview of the Pipe and PipeSpec topics.  Subsequent sections take it more slowly.
+
+For FPGA modules to communicate, conventions must be adopted.   A large number of interactions between functionality in FPGAs conform to fairly simple patterns of information exchange.
+
+<div id="overview_pipeline"></div>
+
+<script type="text/javascript">
+    const overview_pipeline = {
+        children:[
+            { id:"P1", port:1  },
+            { id:"M1", ports:[ "In", "Out" ] },
+            { id:"M2", ports:[ "In", "Out" ] },
+            { id:"P2", port:1  }
+        ],
+        edges:[
+            ["P1","M1.In", 1],
+            ["M1.Out","M2.In", 1],
+            ["M2.Out","P2", 1]
+        ]
+    };
+
+    hdelk.layout( overview_pipeline, "overview_pipeline" );
+</script>
+
+The information that gets conveyed in these interactions can be systematized to the extent that a large proportion of module functionality can be written adopting a small handful of conventions.
+
+Some of the fields adopted in SpokeFPGA modules follow:
+
+- `data` the actual data that flows from producer to consumer.
+- `start` flag indicating that the current data word is the start of a message
+- `stop` flag indicating that the current data word is the last word in a message
+- `valid` flag suggesting when the `data` value is legitimate.
+- `ready` flag suggesting then the data will be consumed if it is provided.
+
+Routing these signals from module to module is error-prone and tedious, so SpokeFPGA provides some help to bundle them all up into a single array which can be easily managed.
+
+If, for example, the data field was 16 bits, then the rest of the data can fit in to a Pipe as follows.
+
+<script type="WaveDrom">
+{
+reg:[
+    {bits: 16,  name: 'data'},
+    {bits: 1,  name: 'start'},
+    {bits: 1,  name: 'stop'},
+    {bits: 1,  name: 'valid'},
+    {bits: 1,  name: 'ready'}
+], config: {bits: 20, bigendian: false},
+}
+</script>
+
+The pipe would be 20 bits of data flowing in one direction, except the `ready` signal which always flows backwards.  All signals are optional except the `ready` and `valid`.
+
+With the pipe data just being one array, it can be declared and used very conveniently.
+
+``` verilog
+    wire [PipeWidth-1:0] pipe_p2c;
+
+    producer p( pipe_p2c );
+    consumer c( pipe_p2c );
+```
+
+Users of the pipe don't have to know what's inside at all, just its width.
+
+While users don't need to know what's in a pipe, the modules that actually do the work certainly do.  We need something that describes what is actually in a pipe.  This is just a data structure with a set of bitfields *that describes fields that make up the pipeline*.  This **PipeSpec** is simply an integer and is typically passed as a parameter to the module that's using the pipe.  The module can then ensure that it is set up correctly to process the pipe that will be connected.
+
+It looks like this:
+
+``` verilog
+
+    // create a PipeSpec for 16 bit data, and Start and Stop signals, using `PS_ macros
+    localparam PipeSpec = `PS_DATA( 16 ) | `PS_START_STOP;
+
+    // declare an array (the pipe) of the correct width
+    wire [`P_w(PipeSpec)-1:0] pipe_p2c;
+
+    // tell the modules what kind of data to expect, then just use the pipe to move data around.
+    producer #( PipeSpec ) p( pipe_p2c );
+    consumer #( PipeSpec ) c( pipe_p2c );
+
+```
+
+The `PipeSpec` itself looks a lot like the data pipe:
+
+<script type="WaveDrom">
+{
+reg:[
+    {bits: 8,  name: 'data_width'},
+    {bits: 1,  name: 'start_stop'},
+    {bits: 7, name:'...', type:2 }
+], config: {bits: 16, lanes:1, bigendian: false}
+}
+</script>
+
+- 8 bits to describe the pipe data width (meaning there can be 0 - 255 bits of data)
+- 1 bit to suggest whether or not the the pipe has `start` and `stop` message delineation.
+- the `ready` & `valid` signals are compulsory so don't have a field for themselves dc
+
+In the code, macro helpers construct the `PipeSpec` and obtain information from it (like how wide the actual pipe is).
+
+- `PS_DATA( 16 ) declares that the data width will be 16 bits.  The value 16 is put in the data_width field.
+- `PS_START_STOP declares that start and stop signals will be used.
+
+These `PipeSpec` constructor macros are or'ed together to build up a spec, so the `PipeSpec` from the above will look like the following:
+
+<script type="WaveDrom">
+{
+reg:[
+    {bits: 8,  name: '16'},
+    {bits: 1,  name: '1'},
+    {bits: 7, name:'...', type:2 }
+], config: {bits: 16, lanes:1, bigendian: false}
+}
+</script>
+
+The PipeSpec can be expanded quite significantly to hold much more data. While the spec will get wider, the pipes that hold the data will only contain the fields that are required.  Some examples of additional fields *in the spec* are:
+
+- `data_size` field is one bit describing how many bits are legal in the `data` field.  This allows larger data fields to be partially filled, including being empty.
+- `command` is 5 bits specifying up to 32 bits of **command** flowing in the same direction as the data, additional to the data path, defined by the application
+- `result` is 5 bits specifying up to 32 bits of **result** flowing in the opposite direction as the data, defined by the application
+- `request` is 5 bits specifying up to 32 bits of **request** flowing in the opposite direction as the data, defined by the application
+- `reverse` - a big one - if set this says that there are mirrored signals of `ready`, `valid` and `data` all working in the opposite direction.
+- `address` is 5 bits specifying up to 32 bits of **address** - the final field that permits the Pipe to be a simple memory bus.
+
+Information about all fields (like their locations in the pipe, and their widths can all be obtained by macro, for example:
+
+``` verilog
+`P_w( PipeSpec )        // provides the width of the Pipe described by PipeSpec
+`P_Data_w( PipeSpec )   // provides the width of the Data field
+```
+
+To make it easy to use pipes specified in this flexible way,  packer and unpacker modules are provided for all fields.  This means that inside a module, appropriate helper modules are used to unpack (extract) and pack (insert) data.  Packers take the PipeSpec as a parameter, the relevant fields as inputs, and the pipe that the field has to be inserted into.  Unpackers also take the PipeSpec, but they take the pipe first then the fields as out-parameters.
+
+Remember the pipes themselves are bidirectional - they have constituent bits that go in both directions.
+
+First `ready` `valid` pack and unpack, which are the only compulsory fields, and which are done together.  Note that there is a tricky reversal for the `ready` field.  It runs in the opposite direction from the others.
+
+```verilog
+module p_pack_valid_ready #( parameter PipeSpec = `PS_d8s ) (
+        input                    valid,
+        output                   ready,
+        inout [`P_w(PipeSpec)-1:0] pipe
+    );
+    ...
+endmodule
+
+module p_unpack_valid_ready #( parameter PipeSpec = `PS_d8s ) (
+        inout [`P_w(PipeSpec)-1:0] pipe,
+        output                   valid,
+        input                    ready
+    );
+    ...
+endmodule
+```
+
+Then `start` `stop` pack and unpack, which are also always done together
+
+```verilog
+module p_pack_start_stop #( parameter PipeSpec = `PS_d8s ) (
+        input                    start,
+        input                    stop,
+        inout [`P_w(PipeSpec)-1:0] pipe
+    );
+    ...
+endmodule
+
+module p_unpack_start_stop #( parameter PipeSpec = `PS_d8s ) (
+        inout [`P_w(PipeSpec)-1:0] pipe,
+        output                   start,
+        output                   stop
+    );
+    ...
+endmodule
+```
+
+Finally for these examples, `data` pack and unpack
+
+```verilog
+module p_pack_data #( parameter PipeSpec = `PS_d8s ) (
+        input [`P_Data_w(PipeSpec)-1:0] data,
+        inout [`P_w(PipeSpec)-1:0]      pipe
+    );
+    ...
+endmodule
+
+module p_unpack_data #( parameter PipeSpec = `PS_d8s ) (
+        inout [`P_w(PipeSpec)-1:0]       pipe,
+        output [`P_Data_w(PipeSpec)-1:0] data
+    );
+    ...
+endmodule
+```
+
+If a packer module is invoked on a field that doesn't exist in the pipe, the value is ignored.  If an unpacker module is used to extract a field that doesn't exist, 0 is returned.
+
+With these tools. Modules can be written that cover an enormous range of functionality and for which specs guide those that can be connected together and safely handle mismatches.
+
+That was an overview of the pipeline system.  Let's take a wider perspective, for a moment to see what we are aiming for.
+
+## Motivation
+
 The first thing that strikes new FPGA engineers is *where the heck are all the code libraries?* There are a few places, like [FuseSoC Cores](https://github.com/fusesoc/fusesoc-cores), [OpenCores](https://opencores.org/), [OH](https://github.com/parallella/oh) but there is nothing like the thousands of libraries available to software developers using Python, Javascript, C, C++, or indeed almost any modern programming language.  Considering that Verilog is *decades* older than some of these incredibly well stocked languages, the mystery deepens.
-
-What are some of the causes of the lack of rich compatible, composable, libraries?
-
-- lack of interface standards (eg. even ready/valid connections have different names and different semantics)
-- vendor lock-in - intentional or incidental.  Libraries provided for use with a particular platform may use platform specific features, making them locked to that particular architecture and often via license unsharable.
-- varying provison of and need for fullness of design makes a module look less appealling (a complete module may feel too heavy to someone looking for a minimal implementation, and vice versa)
-- company libraries don't destinquish proprietary code from code that could potentially be shared, and so it becomes hard to extact code for sharing.
-- lack of a open library tradition.  When engineers don't have a practice of grabbing code from GitHub or similar, it doesn't occur to them to contribute it back.
-- lack of a connecting component tradition.   Designs don't seem to emphasize generic interconnection as a priority.
-- ASIC designers may have a "one and done" orientation.  Designs are very focussed on a single target product, not sharable libraries, and when a design has sucessfully made it into silicon there is very little incentive to reuse that IP other than within the same team.
-- the HDL world is split into Verilog and VHDL meaning that much code is "in the wrong language"
-- the very low level HDL operates at means implementation strategies can vary widely, being appealing to some and not to others.
-- sometimes the code is designed to be put on a processor bus, sometimes not.
-- comprehensive interfaces are long winded.  It is frustrating to wire everything up laboriously.  Verilog is especially bad since there are no structures in that language.
-- one especially vexing situation is when high quality layers are built on top of HDL, for example **System Verilog** and **MiGen**, but this further fragments things!  Incredible libraries exist for these other languages, but of course you have to be using them to use the libraries.  And worse, in some cases you can't use basic Verilog/VHDL modules either!
-
-The effect of all this is that new FPGA engineers tend to avoid low level coding all together, the mode of programming FPGAs becomes more and more connecting cores to a bus and connecting directly or indirectly to a processor and writing C code for it.  This is sad, since some of the excitement of incredibly fast interconnected FPGA IP is lost through relatively slow code execution and increased FPGA system complexity.  It also means that there is pressure to use bigger and bigger FPGA's, since larger LUT counts mean more efficient soft CPUs (more pipelining) and larger code space.  Larger FPGAs are more expensive, boards they sit on are harder to design and more expensive, and larger images are slower to build.
 
 New FPGA developers get some idea of how things work by programming a blinking LED (without library help!), but almost immediately the next step is soft CPU, IP with Wishbone interfaces, C compilers and C code.
 
@@ -47,7 +226,6 @@ Another effect of a lack of library behavior is that even companies providing FP
 
 **Pipelines** are a convention that aims to make connecting Verilog modules easier and promoting re-use.  They do this by formalizing how modules connect together by building on well known Ready/Valid signals, and then offering a shorthand to make this easier.
 
-## Motivation
 
 Pretending for a minute that the above problems did not exist, and that we had a decade or more of compatible IP library development, what would it be reasonable to expect to be able to do?  Dreaming a little...
 
@@ -87,7 +265,7 @@ A simple character echo would have been so reassuring for a first timer.
     hdelk.layout( graph, "host_echo" );
 </script>
 
-The `USB CDC` module is generic and reusable.  Note how thinking about it as a pipeline component and not a bus slave means interesting things can be done with it directly.  In this case just connecting `out` to `in`.
+The `USB CDC` module would be generic and reusable.  Note how thinking about it as a pipeline component and not a bus slave means interesting things can be done with it directly.  In this case just connecting `out` to `in`.
 
 
 ### Function Tester
@@ -186,8 +364,6 @@ It would have been nice to be able to run some message passing code on the host,
 
     hdelk.layout( graph, "host_communication" );
 </script>
-
-`escape` would turn the pipelines' `start` and `stop` packet delimiting signals into escape sequences, and `unescape` would do the opposite.  This would make sending messages over an 8bit line more convenient.
 
 Again, the only code that would need to be written in this case is the highlighted code : the app code on the host and the Verilog internal code on the FPGA.
 
@@ -451,11 +627,36 @@ The hope in providing so many examples is to build the case for a Pipelining app
 
 ## Design
 
-How to design a flexible pipelining system?  If you're intimately familiar with **Valid-Ready** interfaces you might like to skip ahead to the [Start + Stop](#start--stop) section.
+A cornerstone principle of component reuse is that component interfaces have to be compatible.  One big problem when working with FPGA code is that different teams adopt different techniques.
 
-### Data
+<div id="fruit-apples" style="padding: 10px; display: inline-block;"></div>
 
-When one module needs to speak to another there is one thing that must be shared, the data, what ever that is.  We'll call the data sender the **Producer** and the receiver the **Consumer**
+<div id="fruit-oranges" style="padding: 10px; display: inline-block;"></div>
+
+<script type="text/javascript">
+    const apples = {
+        children: [
+            { id: "Apples", outPorts: ["Apple1", "Apple2", "Apple3"] }
+        ]
+    }
+
+    hdelk.layout( apples, "fruit-apples" );
+
+    const oranges = {
+        children: [
+            { id: "Oranges", inPorts: [ "Orange1", "Orange2", "Orange3","Orange4"] }
+        ]
+    }
+
+    hdelk.layout( oranges, "fruit-oranges" );
+</script>
+
+For one system to be able to communicate with another, either someone has to learn Apple language, Orange language and write some glue code, or the teams need to agree on some standards.
+
+What if there were a way to gather together functionality that could, with some assumptions, talk together.  What would that look like?  We're going to call this integration **Pipelines**.  The idea will be to first define a minimal standard for communication, and to then *optionally* draw other details into the standard.  We will start with the `Ready` `Valid` signals, but then expand much further.  At each step we'll show examples that help motivate the changes.
+
+
+Let's assume the functionality that needs to be connected is based on latched data transfers (i.e. not combinatorial hardware).  So the direction would be to find some way for code to transfer data one time per clock tick.  One approach is called the **Valid-Ready** technique.  We'll start there.  Let's call the data sender the **Producer** and the data receiver the **Consumer**
 
 <div id="pipe_data"></div>
 
@@ -474,18 +675,20 @@ When one module needs to speak to another there is one thing that must be shared
     hdelk.layout( graph, "pipe_data" );
 </script>
 
-The edge is thick, because the data is mostly more than one bit wide. We can also use the edge label to describe how big the data field is if necessary
+In this diagram, the edge is drawn thick, because the data is mostly more than one bit wide. We can also use edge labels to describe how big the data field is if necessary.
 
 But when is this data actually available?
 
 <script type="WaveDrom">
 { signal: [
    { name: 'clock', wave: 'p..........'},
-   { name: 'p1.out_data',  wave: 'x.2x2x.2x..', data:'d1 d2 d3'}
+   { name: 'p1.out_data',  wave: 'x.2x2x.2x..', data:'d1 d2 d3 d4 d5 d6'}
   ], config:{skin:"lowkey"} }
 </script>
 
 After a reset it might take a while for data to be valid, more might turn up, but then there may nothing for a while, then more data could become available, etc.  Think about a UART, for example.  Every now and again a character just appears!
+
+How is the consumer to know when the data being presented is good?
 
 ### Valid
 
@@ -523,7 +726,7 @@ This is great.  Now a Consumer can tell when another valid data item is availabl
 
 ### Ready
 
-However, there is another problem here.  What if the Consumer is not ready?  It may take a little bit after a reset to be receptive to data.  Some data may cause it to pause for a little while, etc.  To solve this problem we add the Consumer provided signal, `ready`.
+However, there is another problem here.  What if the Consumer is not ready?  It may take a little bit after a reset to be receptive to data.  Some data may cause it to pause for a little while, etc. If the Producer sends a value, but the Consumer can't accept it at that cycle, the data gets lost. To solve this problem we give the Consumer a signal, `ready`.
 
 <div id="pipe_data_valid_ready"></div>
 
@@ -559,7 +762,7 @@ The 'ready' signal is raised when the Consumer is ready to receive data.  `Ready
 
 This is an improvement, however, the transfer situation just got a lot more complex.  `d1` and `d2` look reasonable, but look at what happens to `d3`.  The Consumer is *not* ready when the Producer is, so *the Producer has to hang onto its data until the Consumer is ready*.  When the Consumer finally is ready, the Producer may release the data.
 
-This gives rise to the common observation that with a valid-ready system, *data is only transfered when both ready and valid signals are true*.  In the example above at times 3,5 and 10.
+It should be obvious from here, *data is only transfered when both ready and valid signals are true*.  In the example above at times 3,5 and 10.
 
 Codewise, if you're a producer and you have data, you'll be in a producer-valid kind of state until you see a `ready` from the consumer.  In Verilog, this might look like the following:
 
@@ -609,11 +812,88 @@ Good Pipeline modules ought to be able to do this whenever possible, but it does
 
 The details of a full pipeline module require their own article.  So for an excellent overview of handshaking in general see the excellent ZipCPU article ["Strategies for Pipelining"](https://zipcpu.com/blog/2017/08/14/strategies-for-pipelining.html)
 
+### Read-Valid Examples
+
+Many application areas are appropriate for Ready-Valid co-ordination.
+
+Communication is an obvious great application for simple synchronization.
+
+<div id="host_communication"></div>
+
+<script type="text/javascript">
+
+    var graph = {
+        color: "#555",
+        children: [
+            { id: "HOST", outPorts: ["usb"],
+                children: [
+                    { id: "Lib", label:"Comms Lib"  },
+                    { id: "App", highlight:1 }
+                ],
+                edges: [
+                    ["App","Lib"],
+                    ["Lib", "HOST.usb"]
+                ]
+             },
+            { id: "FPGA", inPorts: [ "usb"],
+                children: [
+                    { id: "usb_s", label:"usb serial", inPorts: ["usb"], eastPorts:[  "out_data", "out_valid", "out_ready", "in_data", "in_valid", "in_ready" ]  },
+                    { id: "Internals", type:"Verilog", westPorts:["in_data", "in_valid", "in_ready",  "out_data", "out_valid", "out_ready" ]  }
+                ],
+                edges: [
+                    ["FPGA.usb","usb_s.usb", 1 ],
+                    ["usb_s.out_data","Internals.in_data", 1],
+                    ["usb_s.out_valid","Internals.in_valid"],
+                    ["Internals.in_ready","usb_s.out_ready", -1],
+                    ["Internals.out_data","usb_s.in_data", 1, -1],
+                    ["Internals.out_valid","usb_s.in_valid", -1],
+                    ["usb_s.in_ready","Internals.out_ready"]
+                ] }
+        ],
+        edges: [
+            [ "HOST.usb","FPGA.usb" ]
+        ]
+    }
+
+    hdelk.layout( graph, "host_communication" );
+</script>
+
+In this example, if `usb_serial` were written to support Pipelines, we could have confidence that we could write code to that interface, that we could change `usb_serial` implementations and the implementation of the `Internals` independently without concern that they will become incompatible.
+
+If we agree on how data is transfered, we can build general utilities.  Here's a FIFO (First In, First Out) memory unit.
+
+<div id="simple_fifo"></div>
+
+<script type="text/javascript">
+
+    var graph = {
+        children:[
+            { id:"P", type:"Producer", ports:[ "out_data", "out_valid", "out_ready" ] },
+            { id:"Fifo", westPorts:[ "in_data", "in_valid", "in_ready" ], eastPorts:[ "out_data", "out_valid", "out_ready" ] },
+            { id:"C", type:"Consumer", ports:[ "in_data", "in_valid", "in_ready"  ] }
+        ],
+        edges:[
+            ["P.out_data","Fifo.in_data",1],
+            ["P.out_valid","Fifo.in_valid",1],
+            ["Fifo.in_ready","P.out_ready",1, -1],
+            ["Fifo.out_data","C.in_data",1],
+            ["Fifo.out_valid","C.in_valid",1],
+            ["C.in_ready","Fifo.out_ready",1,1]
+        ]
+    }
+
+    hdelk.layout( graph, "simple_fifo" );
+</script>
+
+Producer P creates data.  When it is available (raised `valid`) the FIFO can accept data until it is full in which case it can signal (lowering `ready`) that it's busy.  On the other side, in the beginning, the Consumer C is signaled "nothing available" from the FIFO (`valid` is low).  When characters are available, `valid` goes high.  If the Consumer is ready (`ready` is high) information is transferred.
+
+These are two simple examples of how agreement on a few conventions can make parts transparently internconnectable
+
 ### Start + Stop
 
-Very often sequential data items in a pipeline are parts of multiword **Packets** (also known as **Frames**).  In order to delineate these we add appropriate signals to the pipeline.
+Very often sequential data items in a pipeline are parts of multiword **Messages** (also known as **Packets** or **Frames**).  In order to delineate these we add appropriate signals to the pipeline.
 
-<div id="pipe_packets"></div>
+<div id="pipe_messages"></div>
 
 <script type="text/javascript">
 
@@ -631,10 +911,10 @@ Very often sequential data items in a pipeline are parts of multiword **Packets*
         ]
     }
 
-    hdelk.layout( graph, "pipe_packets" );
+    hdelk.layout( graph, "pipe_messages" );
 </script>
 
-Not surprisingly, the `start` and `stop` signals mark the words that begin and end the packet.
+Not surprisingly, the `start` and `stop` signals mark the words that begin and end the message.
 
 <script type="WaveDrom">
 { signal: [
@@ -648,7 +928,7 @@ Not surprisingly, the `start` and `stop` signals mark the words that begin and e
   config:{skin:"lowkey"} }
 </script>
 
-With this scheme is is possible to have one word packets, but not zero word packets, since there is always a word alongside the `start` and `stop` flags.
+With this scheme is is possible to have one word messages, but not zero word messages, since there is always a word alongside the `start` and `stop` flags.
 
 <script type="WaveDrom">
 { signal: [
@@ -662,7 +942,7 @@ With this scheme is is possible to have one word packets, but not zero word pack
   config:{skin:"lowkey"} }
 </script>
 
-Buses sometimes omit the `start` signal, and have a `stop` signal only (often called `eof` or "end of frame") to indicate that what has come before, since the last `stop` was part of a packet and now it has ended.  But this means that non packet and packet data can't be mixed, and any stray words get prepended to the next packet, so here at the expense of an additional signal line, we have both `start` and `stop` to make it clear.
+Buses sometimes omit the `start` signal, and have a `stop` signal only (often called `eof` or "end of frame") to indicate that what has come before, since the last `stop` was part of a message and now it has ended.  But this means that non message and message data can't be mixed, and any stray words get prepended to the next message, so here at the expense of an additional signal line, we have both `start` and `stop` to make it clear.
 
 ### Data Size
 
@@ -690,7 +970,7 @@ Often, and especially with larger data fields, it is useful to be able to specif
     hdelk.layout( graph, "pipe_data_size" );
 </script>
 
-This is especially useful when converting from serial pipelines to parallel ones and vice versa.  Since all pipelines are fixed width, this permits packets of less than the full size of the parallel data field to be transfered.
+This is especially useful when converting from serial pipelines to parallel ones and vice versa.  Since all pipelines are fixed width, this permits messages of less than the full size of the parallel data field to be transfered.
 
 Let's imagine that we have such a pipeline:
 
@@ -722,7 +1002,7 @@ Let's imagine that we have such a pipeline:
     hdelk.layout( graph, "pipe_serial_parallel" );
 </script>
 
-In this setup, there is a module `p1` that produces packets of data delineated with `start` and `stop` signals.  This serial packet is converted to a parallel one, and the data size is reported as the number of words in the packet x word size in bits.
+In this setup, there is a module `p1` that produces messages of data delineated with `start` and `stop` signals.  This serial message is converted to a parallel one, and the data size is reported as the number of words in the message x word size in bits.
 
 <script type="WaveDrom">
 { signal: [
@@ -740,7 +1020,7 @@ In this setup, there is a module `p1` that produces packets of data delineated w
   config:{skin:"lowkey"} }
 </script>
 
-The `data_size` field can also solve the "can't make an empty packet" problem by setting the data_size on the included data item to zero for an empty packet.  This comes at the expense of lugging around a data_size field so this is not an ideal technique.
+The `data_size` field can also solve the "can't make an empty message" problem by setting the data_size on the included data item to zero for an empty message.  This comes at the expense of lugging around a data_size field so this is not an ideal technique.
 
 <script type="WaveDrom">
 { signal: [
@@ -1491,3 +1771,35 @@ Any other comments?
 - @ me on Twitter - @davidthings
 - leave issues in the repo
 - email me - david@davidthings.com
+
+
+## Verilog
+
+
+<div>
+  <textarea rows="4" cols="50" id="codesnippet">
+
+module sample #( parameter DataWidth = 8 )(
+        input clock,
+        input reset,
+
+        input [DataWidth-1:0] in_data,
+        input                 in_valid,
+        output                in_ready,
+
+        ...
+    );
+
+    ...
+endmodule
+
+  </textarea>
+</div>
+
+<script>
+    var codeMirror = CodeMirror.fromTextArea(document.getElementById('codesnippet'), {
+        mode: { name:"verilog", noIndentKeywords:["package"]},
+        lineNumbers: true,
+        readOnly: false
+    });
+</script>
