@@ -5,7 +5,7 @@ permalink : /pipelines
 toc: true
 toc_label: Contents
 toc_sticky: true
-wavedrom : 1
+wavedrom : 0
 # codemirror: 1
 # threejs: 1
 header:
@@ -14,13 +14,12 @@ header:
 ---
 
 <!-- // this is up here because for some reason WaveDrom doesn't like doing registers before waves -->
-<script type="WaveDrom"> { signal: [ ] } </script>
 
 ## Overview
 
 This section is a quick overview of the Pipe and PipeSpec topics.  Subsequent sections take it more slowly.
 
-For FPGA modules to communicate, conventions must be adopted.   A large number of interactions between functionality in FPGAs conform to fairly simple patterns of information exchange.
+For FPGA modules to communicate, conventions must be adopted.
 
 <div id="overview_pipeline"></div>
 
@@ -56,7 +55,9 @@ Routing these signals from module to module is error-prone and tedious, so Spoke
 
 If, for example, the data field was 16 bits, then the rest of the data can fit in to a Pipe as follows.
 
-<script type="WaveDrom">
+![]({{site.baseurl}}/assets/images/pipelines_PS_d16s.svg)
+
+<!-- <script type="WaveDrom">
 {
 reg:[
     {bits: 16,  name: 'data'},
@@ -64,9 +65,9 @@ reg:[
     {bits: 1,  name: 'stop'},
     {bits: 1,  name: 'valid'},
     {bits: 1,  name: 'ready'}
-], config: {bits: 20, bigendian: false},
+], config: {bits: 20, bigendian: false}
 }
-</script>
+</script> -->
 
 The pipe would be 20 bits of data flowing in one direction, except the `ready` signal which always flows backwards.  All signals are optional except the `ready` and `valid`.
 
@@ -101,7 +102,9 @@ It looks like this:
 
 The `PipeSpec` itself looks a lot like the data pipe:
 
-<script type="WaveDrom">
+![]({{site.baseurl}}/assets/images/pipelines_PS_d8s.svg)
+
+<!-- <script type="WaveDrom">
 {
 reg:[
     {bits: 8,  name: 'data_width'},
@@ -109,7 +112,7 @@ reg:[
     {bits: 7, name:'...', type:2 }
 ], config: {bits: 16, lanes:1, bigendian: false}
 }
-</script>
+</script> -->
 
 - 8 bits to describe the pipe data width (meaning there can be 0 - 255 bits of data)
 - 1 bit to suggest whether or not the the pipe has `start` and `stop` message delineation.
@@ -122,7 +125,10 @@ In the code, macro helpers construct the `PipeSpec` and obtain information from 
 
 These `PipeSpec` constructor macros are or'ed together to build up a spec, so the `PipeSpec` from the above will look like the following:
 
-<script type="WaveDrom">
+![]({{site.baseurl}}/assets/images/pipelines_PS_d16s.svg)
+
+
+<!-- <script type="WaveDrom">
 {
 reg:[
     {bits: 8,  name: '16'},
@@ -130,7 +136,7 @@ reg:[
     {bits: 7, name:'...', type:2 }
 ], config: {bits: 16, lanes:1, bigendian: false}
 }
-</script>
+</script> -->
 
 The PipeSpec can be expanded quite significantly to hold much more data. While the spec will get wider, the pipes that hold the data will only contain the fields that are required.  Some examples of additional fields *in the spec* are:
 
@@ -1119,7 +1125,7 @@ So much better!  The thicker lines indicate that what is being transfered is a b
 
 ### Pipe Specifications
 
-How can we help ourselves in code too?  In almost any other language a data structure would be the natural way to handle this situation.  Put all the fields into a structure and pass it around as one unified object.  The compiler might even type check it for us if we're so lucky.  The (very) bad news is that Verilog does not permit structures.  They are one of the benefits of System Verilog, but questions about uniform support for System Verilog in Vendor and OSS tools results in smirks and head shakes.
+Visually, the convention of the thicker lines is a simpler way to draw pipelines.  How can we help ourselves in code too?  In almost any other language a data structure would be the natural way to handle this situation.  Put all the fields into a structure and pass it around as one unified object.  The compiler might even type check it for us if we're so lucky.  The (very) bad news is that Verilog does not permit structures.  They are one of the benefits of System Verilog, but questions about uniform support for System Verilog in Vendor and OSS tools results in smirks and head shakes.
 
 So what can we do in Verilog itself?  The one thing Verilog does allow is arrays of wires, so could we try to do that?
 
@@ -1161,8 +1167,9 @@ endmodule
 
 Where all the wires of the pipe are packed into the one array:
 
-**Pipe**
-<script type="WaveDrom">
+![]({{site.baseurl}}/assets/images/pipelines_P_d8.svg)
+
+<!-- <script type="WaveDrom">
 {
 reg:[
     {bits: 8,  name: 'data'},
@@ -1170,7 +1177,10 @@ reg:[
     {bits: 1,  name: 'ready'}
 ], config: {bits: 10, bigendian: false},
 }
-</script>
+</script> -->
+
+**Pipe**
+
 
 This is definitely an improvement, but we just spent all the sections above adding new (and optional) wires to our idea of a pipeline, so how do we work out the width?
 
@@ -1185,6 +1195,11 @@ To use them we include a header *before* our module declaration.  It needs to be
 First we need a way to specify the Pipes we're using.  If this were just a single value, that would be great.  Let's try to pack the various configuration options into a single 32bit value called a **PipeSpec**.  This value will only be used during synthesis, and will not make it into our designs unless we explicitly use it.
 
 **PipeSpec**
+
+
+![]({{site.baseurl}}/assets/images/pipelines_PS.svg)
+
+<!--
 <script type="WaveDrom">
 {
 reg:[
@@ -1195,8 +1210,8 @@ reg:[
     {bits: 16, name:'...', type:2 },
     {bits: 16, name:'...', type:2 }
 ], config: {bits: 32, lanes:4, bigendian: false},
-}
 </script>
+} -->
 
 This is not the bundle of wires we're passing around as our pipe, it's a single 32b value encoding *what's in our pipe*.  With a lot of room for growth.
 Note that there is no mention of `ready_valid` since these signals must be present in all pipes.
@@ -1215,7 +1230,9 @@ Let's look at a few
 
 A pipe with just 8 data bits (and the `valid`, `ready` of course)
 
-<script type="WaveDrom">
+![]({{site.baseurl}}/assets/images/pipelines_P_d8.svg)
+
+<!-- <script type="WaveDrom">
 {
 reg:[
     {bits: 8,  name: 'data'},
@@ -1223,12 +1240,18 @@ reg:[
     {bits: 1,  name: 'ready'}
 ], config: {bits: 10, bigendian: false},
 }
-</script>
+</script> -->
 
 The PipeSpec for a pipe with 8 bits of data, and no other features is just
 
 ``` verilog
 8
+```
+
+The field with the size of data is the first one, so this is really,
+
+``` verilog
+8 << 0
 ```
 
 The shorthand for this is
@@ -1241,9 +1264,12 @@ Anywhere you need a PipeSpec, you can use this shorthand to define a pipe with 8
 
 **Example `PS_d8s**
 
-A pipe with start and stop, 8 data bits (and the `valid`, `ready`)
+A pipe with start and stop, 8 data bits (and the compulsory `valid`, `ready`)
 
-<script type="WaveDrom">
+![]({{site.baseurl}}/assets/images/pipelines_P_d8s.svg)
+
+
+<!-- <script type="WaveDrom">
 {
 reg:[
     {bits: 8,  name: 'data'},
@@ -1253,7 +1279,7 @@ reg:[
     {bits: 1,  name: 'ready'}
 ], config: {bits: 12, bigendian: false},
 }
-</script>
+</script> -->
 
 The PipeSpec is
 
@@ -1275,7 +1301,11 @@ The short hand for this is
 
 **Example `PS_d64sz**
 
-<script type="WaveDrom">
+A pipe with 64 bits of data, start stop and data size is
+
+![]({{site.baseurl}}/assets/images/pipelines_P_d64sz.svg)
+
+<!-- <script type="WaveDrom">
 {
 reg:[
     {bits: 64,  name: 'data'},
@@ -1286,9 +1316,9 @@ reg:[
     {bits: 1,  name: 'ready'}
 ], config: {bits: 75, lanes:5, bigendian: false},
 }
-</script>
+</script> -->
 
-The PipeSpec for a pipe with 64 bits of data, start stop and data size is
+The Pipespec that defines it is built up like this:
 
 ``` verilog
 64 | `PS_START_STOP_BIT | `PS_DATA_SIZE
@@ -1343,6 +1373,7 @@ Where are we?  Here's how connecting modules together by pipe used to look:
     wire [DataSize-1:0] xfer_data;
     wire                xfer_valid;
     wire                xfer_ready;
+    ...
 
     producer #( .DataSize( DataSize ) ) p (
             ...
@@ -1658,6 +1689,10 @@ endmodule
 ```
 
 ## Futher Work
+
+### Doc Update
+
+There are now many more fields!
 
 ### More Fields
 

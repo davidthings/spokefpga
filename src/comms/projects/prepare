@@ -1,0 +1,38 @@
+#! /bin/bash
+
+echo "Prepare Build Directory"
+
+if [ -z $1 ]; then
+  echo "    Error: Specify a target from targets/*"
+  exit -1
+fi
+
+if [ $1 = "-h" ] || [ $1 = "--help" ] || [ $1 = "-?" ] || [ $1 = "?" ]; then
+    echo "Useage"
+    echo "    prepare <target_name>"
+    echo "This command will create a build directory of the name build_<target_name>"
+    echo "populated with the files needed to build, program, etc. the target"
+fi
+
+TARGET=$1
+
+BUILD_TARGET="../build_"$TARGET
+
+if [ ! -e $TARGET ]; then
+    echo "Error:"$BUILD_TARGET" Unknown"
+    exit -1
+fi
+
+if [ -e $BUILD_TARGET ]; then
+    echo "    Error:"$BUILD_TARGET" Exists"
+    exit -1
+fi
+
+echo "    Constructing "$BUILD_TARGET
+mkdir $BUILD_TARGET
+
+# cp -p $TARGET/build/* $BUILD_TARGET
+
+ln -s ../projects/$TARGET/build/* -t $BUILD_TARGET
+
+exit 0
