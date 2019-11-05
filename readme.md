@@ -5,3 +5,11 @@
 
 FPGA Code And Tools
 
+## Website
+
+https://davidthings.github.io/spokefpga/
+
+## Source Code
+
+https://github.com/davidthings/spokefpga/src
+

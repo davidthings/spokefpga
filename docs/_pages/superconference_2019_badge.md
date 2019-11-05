@@ -19,6 +19,8 @@ header:
 
 This year's Superconference has *the badge* - Large FPGA-based delight.  Here's the hackaday [announcement](https://hackaday.com/2019/11/04/gigantic-fpga-in-a-game-boy-form-factor-2019-supercon-badge-is-a-hardware-siren-song/).
 
+Features
+
 - ECP5 LFE5U-45F-8BG381C
   - 45k LUTS
   - Embedded RAM 108 x 18kb 1.9Mb
@@ -108,11 +110,11 @@ This year's Superconference has *the badge* - Large FPGA-based delight.  Here's 
     hdelk.layout( badge_soc, "badge_soc" );
 </script>
 
-@sprite_tm has built an entire SoC on the badge, with a twin core RiscV processor, a fancy GPU, lots of memory and best of all, capable of running regular GCC compiled C-code.
+@sprite_tm has built an entire SoC on the badge, with a twin core RiscV processor, a fancy GPU, lots of memory and, amazingly, capable of running regular GCC compiled C-code!
 
 The Repo for all this is - [https://github.com/Spritetm/hadbadge2019_fpgasoc](https://github.com/Spritetm/hadbadge2019_fpgasoc)
 
-Most Supercon party-goers will want to work at this level with these amazing tools since it relies on an embedded C coding skillset.
+Most Supercon party-goers will want to work at this level with these amazing tools.
 
 ## Badge FPGA
 
@@ -120,7 +122,7 @@ Most Supercon party-goers will want to work at this level with these amazing too
 
 For those interested in stretching their Verilog FPGA skills there is the FPGA itself.  Be warned, however, Verilog is hard.  It's not like just picking up a new programming language.  Your brain needs to be rewired.  If you haven't yet undergone that procedure, take it slow and aim appropriately.
 
-Warnings aside, the FPGA itself is an FPGA coder's delight.  Even if the above is the least sexy way to depict it.  The ECP5 is a large device (high LUT count) for it's power and cost. And  best of all, all development can be done using open source tools.
+Warnings aside, the FPGA itself is an FPGA coder's delight.  Even if the above is the least sexy way to depict it.  The ECP5 is a large device (high LUT count) for it's power and price. All development can be done using open source tools.
 
 Read the [general documentation]({{site.baseurl}}/code_library) about the code to get an idea of how the source code is organized.
 
@@ -131,15 +133,17 @@ There are several projects specifically ready to load into hardware.  **Prototyp
 - `lcd_pattern` - puts a few patterns on the LCD screen.  Up button configures the LCD, Bottom button clears it, Left adds a grid pattern and Right adds a color block.  3% FPGA LUT usage.
 - `camera_2_lcd` - connects an MT9V022 or MT9V034 camera to the LCD.  Up button to start the LCD.  Left button to connect camera stream to LCD.  7% FPGA LUT usage
 
-Supporting these projects, the core source code currently available is:
+Supporting these projects, the core source code currently available is as follows:
 
-- I2C Master & Slave
-- LCD Driver
-- Camera Driver
-- USB CDC (originally from Luke Valenty)
+- LCD Driver [Documentation]({{site.baseurl}}/lcd)
+- I2C Master & Slave [Documentation]({{site.baseurl}}/i2c)
+- Camera Driver [Documentation]({{site.baseurl}}/camera)
+- USB CDC (originally from Luke Valenty) [Documentation]({{site.baseurl}}/usb_serial)
 - UART (originally from Open Cores)
 
-There are some projects in the respective directories to test the above in simulators.  These tests are very exhaustive, but there may well still be bugs.  These are fiddly bits of code (especially the USB and I2C).  The UART and USB code has been tested in ECP5, iCE40, and Xilinx hardware, and so should be considered fairly robust.  The I2C Slave has not been tested in hardware at all since it mostly exists to test the I2C Master in simulation.  Both the LCD and Camera have proxies (code that represents the actual hardware) for testing.  These can be very handy for testing new functionality and to ensure things haven't broken when you modify it.
+Documentation is currently a little sparse.
+
+There are some projects in the respective directories to test the above in simulators.  These tests are very exhaustive, but there may well still be bugs.  These are fiddly bits of code (especially the USB and I2C).  The UART and USB codebases have been tested in ECP5, iCE40, and Xilinx hardware, and so should be considered fairly robust.  The I2C Slave has not been tested in hardware at all since it mostly exists to test the I2C Master in simulation.  Both the LCD and Camera have proxies (code that connects to the driver and represents the actual hardware) for testing.  These can be very handy for testing new functionality and to ensure things haven't broken when you modify it.
 
 Additional Code to be released shortly
 
@@ -173,3 +177,4 @@ Additional tools needed for serious coding
 - **GTKWave** - tool for viewing a complete map of all activity of a program on a timeline.
 
 See the [FPGA Tools]({{site.baseurl}}/development_tools) section for more details
+

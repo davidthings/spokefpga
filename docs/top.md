@@ -75,7 +75,7 @@ feature_row:
 
 ## SpokeFPGA
 
-FPGA Tools and Code.  Hackaday Superconference 2019 Badge FPGA Programmers can start with the [Superconference 2019]({{site.baseurl}}/superconference_2019_badge) page.
+FPGA Tools and Code.  Hackaday Superconference 2019 Badge FPGA Programmers can start with the [Superconference 2019 Badge]({{site.baseurl}}/superconference_2019_badge) page.
 
 ## Focus Pages
 
