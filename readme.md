@@ -11,5 +11,5 @@ https://davidthings.github.io/spokefpga/
 
 ## Source Code
 
-https://github.com/davidthings/spokefpga/src
+https://github.com/davidthings/spokefpga/tree/master/src
 
