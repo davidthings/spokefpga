@@ -55,7 +55,7 @@ Routing these signals from module to module is error-prone and tedious, so Spoke
 
 If, for example, the data field was 16 bits, then the rest of the data can fit in to a Pipe as follows.
 
-![]({{site.baseurl}}/assets/images/pipelines_PS_d16s.svg)
+![]({{site.baseurl}}/assets/images/pipelines_P_d16s.svg)
 
 <!-- <script type="WaveDrom">
 {

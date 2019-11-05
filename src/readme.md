@@ -30,6 +30,15 @@ Section
 
 ## Sections
 
+### hadbadge2019
+
+Projects
+
+- `led_blink` - blink an LED
+- `usb_loopback` - instanciates a USB serial device, incoming characters are looped back
+- `lcd_pattern` - puts a few patterns on the LCD
+- `camera_2_lcd` - plain camera to lcd direct connection.  Requires a suitably connected MT9V022 or MT9V034 camera.
+
 ### comms
 
 Code
@@ -49,13 +58,6 @@ Projects
 
 - camera_ic - Icarus-based testing for the camera
 - lcd_ic - Icarus-based testing for the lcd
-
-### hadbadge2019
-
-Projects
-
-- camera - plain camera - lcd connection
-- lcd_usb - lcd & usb running
 
 ### pipe
 
