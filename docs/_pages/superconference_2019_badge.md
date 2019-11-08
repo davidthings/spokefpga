@@ -133,6 +133,10 @@ There are several projects specifically ready to load into hardware.  **Prototyp
 - `lcd_pattern` - puts a few patterns on the LCD screen.  Up button configures the LCD, Bottom button clears it, Left adds a grid pattern and Right adds a color block.  3% FPGA LUT usage.
 - `camera_2_lcd` - connects an MT9V022 or MT9V034 camera to the LCD.  Up button to start the LCD.  Left button to connect camera stream to LCD.  7% FPGA LUT usage
 
+All these projects reassuringly blink a front LED, they also use SW6 to trigger a configuration process.
+
+The make files have `make flash` to invoke `tinyprog` to do a download.  They also have `make boot` which invokes `tinyprog -b` to restart a board in configure mode.
+
 Supporting these projects, the core source code currently available is as follows:
 
 - LCD Driver [Documentation]({{site.baseurl}}/lcd)
