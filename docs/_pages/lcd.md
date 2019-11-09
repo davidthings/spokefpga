@@ -147,8 +147,8 @@ Many of the parameters of the design are brought out as module parameters, howev
 | `lcd_db`                 | In/Out | DataWidth       | LCD Data                   |                            |
 | `lcd_rd`                 | Out    | 1               | LCD ~Read Enable           |                            |
 | `lcd_wr`                 | Out    | 1               | LCD ~Read Enable           |                            |
-| `lcd_rs`                 | Out    | 1               |                            |                            |
-| `lcd_cs`                 | Out    | 1               |                            |                            |
+| `lcd_rs`                 | Out    | 1               | LCD Data or Command        |                            |
+| `lcd_cs`                 | Out    | 1               | LCD Chip Select            |                            |
 | `lcd_id`                 | In     | 1               |                            |  What is this, again?      |
 | `lcd_rst`                | Out    | 1               |                            |                            |
 | `lcd_fmark`              | Out    | 1               |                            |                            |
@@ -228,7 +228,7 @@ The LCD is fixed on the board, and the hardware lines are named in the constrain
         );
 ```
 
-#### Testing
+### Testing
 
 Tested in lcd_tb.v
 

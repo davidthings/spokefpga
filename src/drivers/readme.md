@@ -4,8 +4,8 @@
 
 Code
 
-- `camera_core` - driver for the Aptina MT9V022 camera [Documentation]({{site.baseurl}}/camera)
-- `lcd` - driver for the 480 x 320 MIPI Type II  LCD [Documentation]({{site.baseurl}}/lcd)
+- `camera_core` - driver for the Aptina MT9V022 camera [Documentation](https://davidthings.github.io/spokefpga/camera)
+- `lcd` - driver for the 480 x 320 MIPI Type II  LCD [Documentation](https://davidthings.github.io/spokefpga/lcd)
 
 Projects
 
