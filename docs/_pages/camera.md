@@ -171,7 +171,7 @@ Camera connects to the panel, sends the initialization command stream, then sits
                     ["camera_core.camera_i2c","i2c_master_core.i2c_signals"],
                     ["i2c_master_core.pipe_out", "internals.i2c_in"],
                     ["internals.i2c_out", "i2c_master_core.pipe_in" ],
-                    ["camera_core.video_data",    "internals.camera_data" ],
+                    ["camera_core.camera_data",    "internals.camera_data" ],
                     ["camera_core.window_control", "camera_config.window" ],
                     ["internals.data_port","camera_core.data_port"],
                     ["camera_core.snapshot_control", "camera_config.snapshot" ],
