@@ -10,7 +10,7 @@ PROJECT_DIR   = ../projects/$(PROJECTNAME)
 
 SOURCES =
 
-BADGE_VER ?= 2
+BADGE_VER ?= 3
 
 #Image read mode: qspi, dual-spi, fast-read
 FLASH_MODE=qspi
@@ -51,6 +51,9 @@ prog: ${PROJECTNAME}.svf
 
 flash: $(PROJECTNAME).bit
 	tinyprog -p $(PROJECTNAME).bit -a 0x180000
+
+dfu_flash: $(PROJECTNAME).bit
+	dfu-util$(EXE) -d 1d50:614a,1d50:614b -a 0 -R -D $(PROJECTNAME).bit
 
 clean:
 	rm -f *.svf *.bit *.config *.json
