@@ -20,7 +20,7 @@ SOURCES = \
  	$(PIPE_RTL_DIR)/pipe_utils.v \
 	clock_pll.v
 
-BADGE_VER ?= 2
+BADGE_VER ?= 3
 
 #Image read mode: qspi, dual-spi, fast-read
 FLASH_MODE=qspi
@@ -68,6 +68,10 @@ flash: $(PROJECTNAME).bit
 
 dflash: impl1/${PROJECTNAME}_impl1.bit
 	tinyprog -p impl1/${PROJECTNAME}_impl1.bit -a 0x180000
+
+
+dfu_flash: $(PROJECTNAME).bit
+	dfu-util$(EXE) -d 1d50:614a,1d50:614b -a 0 -R -D $(PROJECTNAME).bit
 
 lint:
 	verilator --lint-only $(SRC) --top-module $(BASENAME)

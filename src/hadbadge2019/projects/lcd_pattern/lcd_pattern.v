@@ -1,7 +1,7 @@
 /*
     Hackaday Superconference 2019 Badge
 
-	Basic - LCD Pattern
+	Basic
 */
 
 `include "../../pipe/rtl/pipe_defs.v"
@@ -119,7 +119,12 @@ module lcd_pattern (
 		end
 	end
 
-	assign led[ 8 ] = led_counter[ 25:19 ] == 0;
+	`ifdef BADGE_V3
+		assign ledc[ 8 ] = led_counter[ 25:19 ] == 0;
+		assign leda = 1;
+	`else
+		assign led[ 8 ] = led_counter[ 25:19 ] == 0;
+	`endif
 
 	//
 	// LCD
@@ -170,6 +175,7 @@ module lcd_pattern (
 		.reset( reset ),
 
 		.command( command ),
+		.abort( 1'H0 ),
 		.ready( ready ),
 
 		.fill_pixel( fill_pixel ),
@@ -302,12 +308,23 @@ module lcd_pattern (
 		end
 	end
 
-	assign led[ 7 ] = button_timer_expired;
-	assign led[ 6 ] = ready;
-	assign led[ 5 ] = ~btn[ 0 ];
-	assign led[ 4 ] = ~btn[ 1 ];
-	assign led[ 3 ] = ~btn[ 2 ];
-	assign led[ 2 ] = ~btn[ 3 ];
-	assign led[ 1 ] = ~btn[ 4 ];
+	`ifdef BADGE_V3
+        assign ledc[ 7 ] = button_timer_expired;
+        assign ledc[ 6 ] = ready;
+        assign ledc[ 5 ] = ~btn[ 0 ];
+        assign ledc[ 4 ] = ~btn[ 1 ];
+        assign ledc[ 3 ] = ~btn[ 2 ];
+        assign ledc[ 2 ] = ~btn[ 3 ];
+        assign ledc[ 1 ] = ~btn[ 4 ];
+		assign leda = 1;
+	`else
+        assign led[ 7 ] = button_timer_expired;
+        assign led[ 6 ] = ready;
+        assign led[ 5 ] = ~btn[ 0 ];
+        assign led[ 4 ] = ~btn[ 1 ];
+        assign led[ 3 ] = ~btn[ 2 ];
+        assign led[ 2 ] = ~btn[ 3 ];
+        assign led[ 1 ] = ~btn[ 4 ];
+	`endif
 
 endmodule

@@ -684,7 +684,7 @@ module camera_config #(
                 CC_VERSION: begin // 2
                         if ( cc_i2c_ready ) begin
                             if ( comms_timer_expired ) begin
-                                if ( ( cc_i2c_result == cc_i2c_length ) && ( ( cc_i2c_data_in == Register_ChipVersion_MT9V022 ) || ( cc_i2c_data_in == Register_ChipVersion_MT9V034 ) ) ) begin
+                                if ( ( cc_i2c_result == cc_i2c_length ) ) begin // && ( ( cc_i2c_data_in == Register_ChipVersion_MT9V022 ) || ( cc_i2c_data_in == Register_ChipVersion_MT9V034 ) ) ) begin
                                     cc_configuration_index <= ConfigurationResetIndex;
                                     cc_state <= CC_CONFIGURE;
                                     cc_i2c_length <= 2;

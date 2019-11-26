@@ -115,8 +115,12 @@ module usb_loopback (
 		end
 	end
 
-	assign led[ 8 ] = led_counter[ 25:19 ] == 0;
-	assign led[ 7:0 ] = 0;
+	`ifdef BADGE_V3
+		assign ledc[ 8 ] = led_counter[ 25:19 ] == 0;
+		assign leda = 1;
+	`else
+		assign led[ 8 ] = led_counter[ 25:19 ] == 0;
+	`endif
 
 	//
 	// USB CDC ACM

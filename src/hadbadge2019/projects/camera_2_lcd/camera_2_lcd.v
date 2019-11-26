@@ -1,5 +1,5 @@
 /*
-    Camera 2 LCD
+    Camera
 
 		MT9V034 / MT9V022 Interface to LCD
 
@@ -19,43 +19,41 @@
 	Electrical Connections
 
 
-        | J6 | GENIO |Cam Pin|PIN NAME      | TYPE   |DESCRIPTION|
-        | -  |  -    | -     | -            | -      | - |
-        |    |       | 1     | VCC          | POWER  | 3.3v Power supply |
-        |    |       | 2     | GND          | Ground | Power ground |
-        | 27 | 18    | 3     | SCL          | Input  | Two-Wire Serial Interface Clock |
-        | 28 | 19    | 4     | SDA(SDATA)   | Bi-directional | Two-Wire Serial Interface Data I/O |
-        | 25 | 16    | 5     | VS(VSYNC)    | Output | Active High: Frame Valid; indicates active frame |
-        | 26 | 17    | 6     | HS(HREF)     | Output | Active High: Line/Data Valid; indicates active pixels |
-        | 23 | 14    | 7     | PCLK         | Output | Pixel Clock output from sensor |
-        | 24 | 15    | 8     | XCLK         | Input | Master Clock into Sensor |
-        | 21 | 12    | 9     | D9           | Output | Pixel Data Output 9(MSB) |
-        | 22 | 13    | 10    | D8           | Output | Pixel Data Output 7(MSB) |
-        | 19 | 10    | 11    | D7           | Output | Pixel Data Output 7(MSB) |
-        | 20 | 11    | 12    | D6           | Output | Pixel Data Output 6      |
-        | 17 |  8    | 13    | D5           | Output | Pixel Data Output 5      |
-        | 18 |  9    | 14    | D4           | Output | Pixel Data Output 4      |
-        | 15 |  6    | 15    | D3           | Output | Pixel Data Output 3      |
-        | 16 |  7    | 16    | D2           | Output | Pixel Data Output 2      |
-        | 13 |  4    | 17    | D1           | Output | Pixel Data Output 1      |
-        | 14 |  5    | 18    | D0           | Output | Pixel Data Output 0 (LSB)|
-        | 11 |  2    | 19    | RST          | Input  | Sensor Reset |
-        | 12 |  3    | 20    | PDN(PWDN)    | Input  | Standby (active high) |
-        |  9 |  0    | 21    | Trigger(EXP) | Input  | External trigger  |
-        | 10 |  1    | 22    | LED          | Output | LED Strobe |
+        | J6 | GENIO |Pin No.|PIN NAME  | TYPE   |DESCRIPTION|
+        | -  |  - | - | -            | -      | - |
+        |    |    | 1 | VCC          | POWER  | 3.3v Power supply |
+        |    |    | 2 | GND          | Ground | Power ground |
+        | 27 | 18 | 3 | SCL          | Input  | Two-Wire Serial Interface Clock |
+        | 28 | 19 | 4 | SDA(SDATA)   | Bi-directional | Two-Wire Serial Interface Data I/O |
+        | 25 | 16 | 5 | VS(VSYNC)    | Output | Active High: Frame Valid; indicates active frame |
+        | 26 | 17 | 6 | HS(HREF)     | Output | Active High: Line/Data Valid; indicates active pixels |
+        | 23 | 14 | 7 | PCLK         | Output | Pixel Clock output from sensor |
+        | 24 | 15 | 8 | XCLK         | Input | Master Clock into Sensor |
+        | 21 | 12 | 9 | D9           | Output | Pixel Data Output 9(MSB) |
+        | 22 | 13 | 10| D8           | Output | Pixel Data Output 7(MSB) |
+        | 19 | 10 | 11| D7           | Output | Pixel Data Output 7(MSB) |
+        | 20 | 11 | 12| D6           | Output | Pixel Data Output 6      |
+        | 17 |  8 | 13| D5           | Output | Pixel Data Output 5      |
+        | 18 |  9 | 14| D4           | Output | Pixel Data Output 4      |
+        | 15 |  6 | 15| D3           | Output | Pixel Data Output 3      |
+        | 16 |  7 | 16| D2           | Output | Pixel Data Output 2      |
+        | 13 |  4 | 17| D1           | Output | Pixel Data Output 1      |
+        | 14 |  5 | 18| D0           | Output | Pixel Data Output 0 (LSB)|
+        | 11 |  2 | 19| RST          | Input  | Sensor Reset |
+        | 12 |  3 | 20| PDN(PWDN)    | Input  | Standby (active high) |
+        |  9 |  0 | 21| Trigger(EXP) | Input  | External trigger output  |
+        | 10 |  1 | 22| LED          | Output | LED Strobe |
 
             Note: Arducam Document is wrong re: 21 & 22.  They are exchanged.  This was very annoying.
 
     Dependencies
 
         camera_core - for the camera logic
-            i2c_master - to configure and control the camera
+            i2c_master
 
         lcd
 
     Issues
-
-        This is built for the Prototype - it won't build for the Final Version
 
         Mysteriously we need the horizontal line to be one pixel too long for the image to match up
         properly.  This is (at least one) off by one error somewhere.
@@ -166,7 +164,7 @@ module camera_2_lcd (
 	reg fpga_reload=0;
 	assign programn = ~fpga_reload;
 	always @( posedge clock_48mhz )
-		if ( ~btn[4] )
+		if ( !btn[4] )
 			fpga_reload <= 1;
 
 	//
@@ -181,7 +179,11 @@ module camera_2_lcd (
 		end
 	end
 
-	assign led[ 8 ] = led_counter[ 25:19 ] == 0;
+    `ifdef BADGE_V3
+	    assign ledc[ 8 ] = led_counter[ 25:19 ] == 0; // D15
+    `else
+	    assign led[ 8 ] = led_counter[ 25:19 ] == 0; // D15
+    `endif
 
 	//
 	// Camera
@@ -354,7 +356,7 @@ module camera_2_lcd (
     // Tristate Ports - Clock is pure output, data needs to be bidirectional (Open Drain)
 	// T : Tristate, not Transmit!
 	BB clock_io( .I( scl_out ), .T( 0 ), .O( scl ), .B( genio[18] ) );
-	BB   data_io( .I( 0 ), .T( sda_out), .O( sda ), .B( genio[19] ) );
+	BBPU   data_io( .I( 0 ), .T( sda_out), .O( sda ), .B( genio[19] ) );
 
 	//
 	// CAMERA LOGIC
@@ -591,6 +593,7 @@ module camera_2_lcd (
 
 		.command( lcd_command ),
 		.ready( lcd_ready ),
+        .abort( 1'H0 ),
 
 		.fill_pixel( lcd_fill_pixel ),
 
@@ -745,12 +748,22 @@ module camera_2_lcd (
 	// OB  o_p7( .O( pmod[ 7 ] ), .I( debug[ 3 ] ) );
 
 
-	assign led[ 7 ] = control_timer_expired;
-	assign led[ 6 ] = lcd_ready;
-	assign led[ 5 ] = ~btn[ 0 ];
-	assign led[ 4 ] = ~btn[ 1 ];
-	assign led[ 3 ] = ~btn[ 2 ];
-	assign led[ 2 ] = ~btn[ 3 ];
-	assign led[ 1 ] = ~btn[ 4 ];
+    `ifdef BADGE_V3
+        assign ledc[ 7 ] = control_timer_expired;
+        assign ledc[ 6 ] = lcd_ready;
+        assign ledc[ 5 ] = ~btn[ 0 ];
+        assign ledc[ 4 ] = ~btn[ 1 ];
+        assign ledc[ 3 ] = ~btn[ 2 ];
+        assign ledc[ 2 ] = ~btn[ 3 ];
+        assign ledc[ 1 ] = ~btn[ 4 ];
+    `else
+        assign led[ 7 ] = control_timer_expired;
+        assign led[ 6 ] = lcd_ready;
+        assign led[ 5 ] = ~btn[ 0 ];
+        assign led[ 4 ] = ~btn[ 1 ];
+        assign led[ 3 ] = ~btn[ 2 ];
+        assign led[ 2 ] = ~btn[ 3 ];
+        assign led[ 1 ] = ~btn[ 4 ];
+    `endif
 
 endmodule
