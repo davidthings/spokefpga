@@ -1,22 +1,24 @@
 ![](/docs/assets/images/spokefpga_banner_thin.png)
 
-## Drivers
+## Image
+
+Overview
+
+These modules use the image spec definitions from image_defs.h (and pipe specs too) to create pipelines
+for images. From the `drivers` directory `camera_image` can create images from a camera and `lcd_image` and
+`lcd_image_n` can display one or more images (respectively) on an lcd.
 
 Code
 
-- `camera_core` - driver for the Aptina MT9V022 camera [Documentation](https://davidthings.github.io/spokefpga/camera)
-- `camera_image` - using `camera_core` creates images suitable for image pipeline modules
-- `lcd` - driver for the 480 x 320 MIPI Type II  LCD [Documentation](https://davidthings.github.io/spokefpga/lcd)
-- `lcd_image` - using `lcd` takes images from a image pipeline and displays them
-- `lcd_image_n` - using `lcd` takes images from multiple image pipelines and displays them all
+- `image_defs.v` - include file for image helper macros
+- `image_fifo` - buffering pixels (helps with fast camera and slow lcd)
+- `image_background` - creates solid or simple patterned images for use as backgrounds
+- `image_reformat` - converts between pixel formats (currently mostly for grayscale to rgb)
+- `image_debayer` - using a half line buffer, converts incoming bayer patterned pixels to rgb
 
 Projects
 
-- `camera_ic` - Icarus-based testing for the camera
-- `lcd_ic` - Icarus-based testing for the lcd
-- `camera_image_ic` - Icarus-based testing for the image pipeline-based camera
-- `lcd_image_ic` - Icarus-based testing for the lcd image module
-- `lcd_image_n_ic` - Icarus-based testing for the lcd image n module
+- testing for the above
 
 ## Common Structure
 
@@ -58,3 +60,6 @@ For example, most build directories will contain a Makefile that is all set up a
 Documentation for the larger systems is presented on the SpokeFPGA [website](http://localhost:4000/spokefpga/#top).
 
 The source code itself has documentation.
+
+
+

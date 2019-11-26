@@ -8,6 +8,10 @@ Projects
 - `usb_loopback` - instanciates a USB serial device, incoming characters are looped back
 - `lcd_pattern` - puts a few patterns on the LCD
 - `camera_2_lcd` - plain camera to lcd direct connection.  Requires a suitably connected MT9V022 or MT9V034 camera.
+- `camera_image_lcd` - camera to lcd via image pipeline (fifo and reformat)
+- `camera_image_n_lcd` - camera and 6 backgrounds to lcd via image pipelines
+- `color_camera_image_lcd` - camera to lcd via image pipeline including `image_debayer`
+- `color_camera_image_n_lcd` - camera to lcd via image pipeline including `image_debayer` and the 6 backgrounds
 
 ## Common Structure
 
