@@ -19,33 +19,25 @@
 ##         $dumpvars(1,t_1MHz_1ms);       // dump the module - 1 means and one layer underneath
 ##     end
 
-BASENAME := image_reformat
+BASENAME := pipe_frontend
 TARGET := $(BASENAME)_tb
 
-IMAGE_SIM := ../sim
-IMAGE_RTL := ../../image/rtl
-PIPE_RTL := ../../pipe/rtl
+SIM := ../sim
+RTL := ../rtl
 
-SOURCE := $(IMAGE_SIM)/$(TARGET).v $(IMAGE_RTL)/$(BASENAME).v $(IMAGE_RTL)/image_defs.v
+SOURCE := $(SIM)/$(TARGET).v $(RTL)/$(BASENAME).v $(RTL)/pipe_utils.v
 CC = iverilog
-FLAGS = -Wall -Winfloop -gstrict-expr-width
+FLAGS = -Wall -Winfloop
 
 all: $(TARGET)
 
 $(TARGET): $(SOURCE)
-	$(CC) -s $(TARGET) $(FLAGS) -o $@ $^
+	$(CC) $(FLAGS) -o $@ $^
 
 sim: $(TARGET)
 	vvp -n $<
 
 wave : $(TARGET).vcd
 	gtkwave $(TARGET).vcd
-
-lint:
-<<<<<<< HEAD
-	verilator --lint-only $(IMAGE_RTL)/$(BASENAME).v
-=======
-	verilator -g2009 --lint-only $(IMAGE_RTL)/$(BASENAME).v
->>>>>>> bd47fc1bde0bf3353d999bf313160dd47b8b4925
 
 .PHONY: all sim wave install

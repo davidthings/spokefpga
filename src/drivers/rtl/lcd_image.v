@@ -126,7 +126,11 @@ module lcd_image #(
     `include "../../drivers/rtl/lcd_defs.v"
 
     // create a spec for the display
+<<<<<<< HEAD
     parameter [`IS_w-1:0] LcdIs = `IS( 0, 0, LcdWidth, LcdHeight, 0, 1,`IS_FORMAT_RGB, LcdPixelRedWidth, LcdPixelGreenWidth, LcdPixelBlueWidth, 0, 0 );
+=======
+    parameter LcdIs = `IS( 0, 0, LcdWidth, LcdHeight, 0, 1,`IS_FORMAT_RGB, LcdPixelRedWidth, LcdPixelGreenWidth, LcdPixelBlueWidth, 0, 0 );
+>>>>>>> bd47fc1bde0bf3353d999bf313160dd47b8b4925
 
     localparam LcdWidthWidth = `IS_WIDTH_WIDTH( LcdIs );
     localparam LcdHeightWidth = `IS_HEIGHT_WIDTH( LcdIs );
@@ -251,6 +255,7 @@ module lcd_image #(
     assign running = li_running;
     assign busy = li_busy;
 
+<<<<<<< HEAD
     localparam LI_STATE_START          = 0,
                LI_STATE_CONFIGURE      = 1,
                LI_STATE_IDLE           = 2,
@@ -263,10 +268,23 @@ module lcd_image #(
                LI_STATE_END_TRANSFER   = 9,
                LI_STATE_ABORT_TRANSFER = 10,
                LI_STATE_BUSY           = 11;
+=======
+    localparam LC_STATE_START          = 0,
+               LC_STATE_CONFIGURE      = 1,
+               LC_STATE_IDLE           = 2,
+               LC_STATE_REFRESH        = 3,
+               LC_STATE_START_TRANSFER = 4,
+               LC_STATE_TRANSFER       = 5,
+               LC_STATE_STALL          = 6,
+               LC_STATE_END_TRANSFER   = 7,
+               LC_STATE_ABORT_TRANSFER = 8,
+               LC_STATE_BUSY           = 9;
+>>>>>>> bd47fc1bde0bf3353d999bf313160dd47b8b4925
 
     reg [3:0]  li_state;
 
     assign debug[3:0] = li_state;
+<<<<<<< HEAD
     assign debug[4] = ( image_transfer_count_next == ImageTransferSize );
     assign debug[5] = lcd_rect_pixel_write_ready;
 
@@ -275,12 +293,22 @@ module lcd_image #(
 
     localparam TimeOutCountWidth = $clog2( TimeOutCount + 1 ) + 1;
     localparam TimeOutCountShort = 4;
+=======
+
+    reg  [ImageTransferSizeWidth-1:0] image_transfer_count;
+    wire [ImageTransferSizeWidth-1:0] image_transfer_count_next = image_transfer_count + 1;
+
+    localparam TimeOutCountWidth = $clog2( TimeOutCount + 1 ) + 1;
+>>>>>>> bd47fc1bde0bf3353d999bf313160dd47b8b4925
 
     reg [TimeOutCountWidth:0] li_timeout_counter;
     wire li_timeout_expired = li_timeout_counter[ TimeOutCountWidth ];
 
+<<<<<<< HEAD
     reg [ImageDataWidth-1:0] image_in_data_overflow;
 
+=======
+>>>>>>> bd47fc1bde0bf3353d999bf313160dd47b8b4925
     always @( posedge clock ) begin
 
         if ( reset ) begin
@@ -289,7 +317,11 @@ module lcd_image #(
             li_running <= 0;
             li_busy <= 0;
 
+<<<<<<< HEAD
             li_state <= LI_STATE_START;
+=======
+            li_state <= LC_STATE_START;
+>>>>>>> bd47fc1bde0bf3353d999bf313160dd47b8b4925
             lcd_command <= LCD_COMMAND_NONE;
             lcd_abort <= 0;
 
@@ -314,6 +346,7 @@ module lcd_image #(
 
         end else begin
             case ( li_state )
+<<<<<<< HEAD
                 LI_STATE_START: begin // 0
                         lcd_command <= LCD_COMMAND_CONFIGURE;
                         li_state <= LI_STATE_CONFIGURE;
@@ -340,11 +373,35 @@ module lcd_image #(
                         end
                     end
                 LI_STATE_IDLE: begin // 2
+=======
+                LC_STATE_START: begin // 0
+                        lcd_command <= LCD_COMMAND_CONFIGURE;
+                        li_state <= LC_STATE_CONFIGURE;
+                        li_configuring <= 1;
+                        li_busy <= 1;
+                    end
+                LC_STATE_CONFIGURE: begin // 1
+                        if ( lcd_ready ) begin
+                            lcd_fill_pixel <= 1;
+                            lcd_rect_x0 <= 0;
+                            lcd_rect_x1 <= LcdWidth - 1;
+                            lcd_rect_y0 <= 0;
+                            lcd_rect_y1 <= LcdHeight - 1;
+                            lcd_command <= LCD_COMMAND_FILL_RECT;
+                            li_state <= LC_STATE_BUSY;
+                        end else begin
+                            lcd_command <= LCD_COMMAND_NONE;
+                        end
+                    end
+                LC_STATE_IDLE: begin // 2
+                        li_busy <= 0;
+>>>>>>> bd47fc1bde0bf3353d999bf313160dd47b8b4925
                         li_configuring <= 0;
                         li_running <= 1;
 
                         lcd_abort <= 0;
                         image_in_cancel <= 0;
+<<<<<<< HEAD
 
                         if ( refresh ) begin
                             li_busy <= 1;
@@ -354,6 +411,14 @@ module lcd_image #(
                         end
                     end
                 LI_STATE_REFRESH: begin // 3
+=======
+                        if ( refresh ) begin
+                            li_busy <= 1;
+                            li_state <= LC_STATE_REFRESH;
+                        end
+                    end
+                LC_STATE_REFRESH: begin // 3
+>>>>>>> bd47fc1bde0bf3353d999bf313160dd47b8b4925
                         lcd_rect_x0 <= ImageRectX0;
                         lcd_rect_x1 <= ImageRectX1;
                         lcd_rect_y0 <= ImageRectY0;
@@ -361,6 +426,7 @@ module lcd_image #(
                         lcd_command <= LCD_COMMAND_WRITE_RECT;
                         image_in_ready <= 0;
                         image_in_request <= 1;
+<<<<<<< HEAD
                         li_state <= LI_STATE_START_TRANSFER;
                     end
                 LI_STATE_START_TRANSFER: begin // 4
@@ -452,30 +518,102 @@ module lcd_image #(
                                     image_transfer_count <= image_transfer_count_next;
                                     li_state <= LI_STATE_TRANSFER;
                                 end
+=======
+                        li_state <= LC_STATE_START_TRANSFER;
+                    end
+                LC_STATE_START_TRANSFER: begin // 4
+                        lcd_command <=  LCD_COMMAND_NONE;
+                        image_in_request <= 0;
+                        image_in_ready <= 1;
+                        image_transfer_count <= 0;
+                        li_state <= LC_STATE_TRANSFER;
+                        lcd_rect_pixel_write_valid <= 0;
+                        li_timeout_counter <= TimeOutCount;
+                    end
+                LC_STATE_TRANSFER: begin // 5
+                        if ( !li_timeout_expired ) begin
+                            if ( image_in_valid && ( ( image_transfer_count != 0 ) || image_in_start ) ) begin
+                                li_timeout_counter <= TimeOutCount;
+                                lcd_rect_pixel_write <= image_in_data;
+                                lcd_rect_pixel_write_valid <= 1;
+                                if ( image_transfer_count_next == ImageTransferSize ) begin
+                                    image_transfer_count <= 0;
+                                    image_in_ready <= 0;
+                                    li_state <= LC_STATE_END_TRANSFER;
+                                end else begin
+                                    if ( image_in_stop ) begin // || ( ( image_transfer_count != 0 ) && image_in_start ) ) begin  Hmmm
+                                        li_state <= LC_STATE_ABORT_TRANSFER;
+                                    end else begin
+                                        if ( ~lcd_rect_pixel_write_ready ) begin
+                                            image_in_ready <= 0;
+                                            li_state <= LC_STATE_STALL;
+                                        end else begin
+                                            image_transfer_count <= image_transfer_count_next;
+                                            lcd_rect_pixel_write <= image_in_data;
+                                        end
+                                    end
+                                end
+                            end else begin
+                                li_timeout_counter <= li_timeout_counter - 1;
+                                lcd_rect_pixel_write <= 0;
+                                lcd_rect_pixel_write_valid <= 0;
+                            end
+                        end else begin
+                            // timeout (more than TimeOutCount cycles sine last valid char)
+                            li_state <= LC_STATE_ABORT_TRANSFER;
+                        end
+                    end
+                LC_STATE_STALL: begin // 6
+                        if ( !li_timeout_expired ) begin
+                            if ( lcd_rect_pixel_write_ready ) begin
+                                li_timeout_counter <= TimeOutCount;
+                                image_transfer_count <= image_transfer_count_next;
+                                li_state <= LC_STATE_TRANSFER;
+                                image_in_ready <= 1;
+>>>>>>> bd47fc1bde0bf3353d999bf313160dd47b8b4925
                             end else begin
                                 li_timeout_counter <= li_timeout_counter - 1;
                             end
                         end else begin
+<<<<<<< HEAD
                             li_state <= LI_STATE_ABORT_TRANSFER;
                         end
                     end
                 LI_STATE_END_TRANSFER: begin // 9
+=======
+                            li_state <= LC_STATE_ABORT_TRANSFER;
+                        end
+                    end
+                LC_STATE_END_TRANSFER: begin // 7
+>>>>>>> bd47fc1bde0bf3353d999bf313160dd47b8b4925
                         if ( lcd_rect_pixel_write_ready ) begin
                             li_timeout_counter <= TimeOutCount;
                             lcd_rect_pixel_write <= 0;
                             image_in_ready <= 0;
                             lcd_rect_pixel_write_valid <= 0;
                             li_busy <= 0;
+<<<<<<< HEAD
                             li_state <= LI_STATE_IDLE;
+=======
+                            li_state <= LC_STATE_IDLE;
+>>>>>>> bd47fc1bde0bf3353d999bf313160dd47b8b4925
                         end else begin
                             if ( !li_timeout_expired ) begin
                                 li_timeout_counter <= li_timeout_counter - 1;
                             end else begin
+<<<<<<< HEAD
                                 li_state <= LI_STATE_ABORT_TRANSFER;
                             end
                         end
                     end
                 LI_STATE_ABORT_TRANSFER: begin // 10
+=======
+                                li_state <= LC_STATE_ABORT_TRANSFER;
+                            end
+                        end
+                    end
+                LC_STATE_ABORT_TRANSFER: begin // 8
+>>>>>>> bd47fc1bde0bf3353d999bf313160dd47b8b4925
                         lcd_rect_pixel_write <= 0;
                         lcd_rect_pixel_write_valid <= 0;
                         image_transfer_count <= 0;
@@ -483,6 +621,7 @@ module lcd_image #(
                         lcd_abort <= 1;
                         image_in_cancel <= 1;
                         li_busy <= 0;
+<<<<<<< HEAD
                         li_state <= LI_STATE_IDLE;
                     end
                 LI_STATE_BUSY: begin // 11
@@ -493,6 +632,14 @@ module lcd_image #(
                             end
                         end else begin
                             li_timeout_counter <= li_timeout_counter - 1;
+=======
+                        li_state <= LC_STATE_IDLE;
+                    end
+                LC_STATE_BUSY: begin // 9
+                        lcd_command <= LCD_COMMAND_NONE;
+                        if ( lcd_ready ) begin
+                            li_state <= LC_STATE_IDLE;
+>>>>>>> bd47fc1bde0bf3353d999bf313160dd47b8b4925
                         end
                     end
             endcase

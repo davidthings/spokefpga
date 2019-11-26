@@ -22,7 +22,11 @@
 BASENAME := image_background
 TARGET := $(BASENAME)_tb
 
+<<<<<<< HEAD
 IMAGE_SIM := ../../image/sim
+=======
+IMAGE_SIM := ../sim
+>>>>>>> bd47fc1bde0bf3353d999bf313160dd47b8b4925
 IMAGE_RTL := ../../image/rtl
 PIPE_RTL := ../../pipe/rtl
 
@@ -49,7 +53,10 @@ wave : $(TARGET).vcd
 lint:
 	verilator --lint-only $(IMAGE_RTL)/$(BASENAME).v
 
+<<<<<<< HEAD
 lint_tb:
 	verilator --lint-only $(IMAGE_SIM)/$(BASENAME)_tb.v
 
+=======
+>>>>>>> bd47fc1bde0bf3353d999bf313160dd47b8b4925
 .PHONY: all sim wave install

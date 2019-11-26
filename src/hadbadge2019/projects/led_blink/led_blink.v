@@ -1,9 +1,7 @@
 /*
     Hackaday Superconference 2019 Badge
 
-	Basic LED Blinker
-
-    Note: this is built for the Prototype - it won't build for the Final Version
+	Basic
 */
 
 module led_blink (
@@ -79,7 +77,7 @@ module led_blink (
 	reg fpga_reload = 0;
 	assign programn = ~fpga_reload;
 	always @( posedge clk )
-		if ( ~reset && ~btn[4] )
+		if ( ~reset && !btn[6] && !bnt[7] )
 			fpga_reload <= 1;
 
 	//
@@ -94,8 +92,19 @@ module led_blink (
 		end
 	end
 
-	assign led[ 8 ] = !led_counter[ 23:17 ];
-	assign led[ 7:0 ] = 0;
+	`ifdef BADGE_V3
+		assign ledc[ 8 ] = !led_counter[ 23:17 ];
+		assign ledc[ 7 ] = !btn[7];
+		assign ledc[ 6 ] = !btn[6];
+		assign ledc[ 5:0 ] = 0;
+		assign leda = 1;
+	`else
+		assign led[ 8 ] = !led_counter[ 23:17 ];
+		assign led[ 7 ] = !btn[7];
+		assign led[ 6 ] = !btn[6];
+		assign led[ 5:0 ] = 0;
+	`endif
+
 
 
 endmodule
