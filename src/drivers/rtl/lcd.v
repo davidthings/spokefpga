@@ -138,6 +138,7 @@ module lcd #(
 
         // LCD Control
         input [ CommandWidth-1:0]   command,
+        input                       abort,
 
         input [PixelWidth-1:0]      fill_pixel,
 
@@ -157,6 +158,7 @@ module lcd #(
         output                      rect_pixel_read_valid,
         input                       rect_pixel_read_ready,
 
+        // LCD Status
         output ready,
 
         //LCD interface
@@ -244,6 +246,9 @@ module lcd #(
 
     reg lcd_rect_pixel_write_ready;
 
+    reg lcd_rect_pixel_read;
+    reg lcd_rect_pixel_read_valid;
+
     reg [PixelWidth-1:0] lcd_fill_pixel;
 
     reg lcd_stored_y_new;
@@ -259,6 +264,8 @@ module lcd #(
     reg [DataWidth-1:0] lcd_io_data;
 
     reg lcd_io_tick;
+
+    reg lcd_aborted;
 
     always @( posedge clock ) begin
         if ( reset ) begin
@@ -279,13 +286,26 @@ module lcd #(
             lcd_x <= 0;
             lcd_y <= 0;
             lcd_command <= LCD_COMMAND_NONE;
+            lcd_aborted <= 0;
             lcd_stored_y_new <= 0;
             lcd_io_tick <= 0;
             lcd_io_rw <= LCD_IO_READ;
             lcd_io_dc <= LCD_IO_COMMAND;
             lcd_io_data <= 0;
             lcd_rect_pixel_write_ready <= 0;
+
+            lcd_rect_pixel_read <= 0;
+            lcd_rect_pixel_read_valid <= 0;
+
         end else begin
+            // capture any abort requests, no matter when they might occur.  Clear upon return to READY
+            // This means we can check for an abort at fewer places.
+            if ( lcd_state == LCD_STATE_READY) begin
+                lcd_aborted <= 0;
+            end else begin
+                if ( abort )
+                    lcd_aborted <= 0;
+            end
             case ( lcd_state )
                 LCD_STATE_IDLE: begin
                         if ( command == LCD_COMMAND_CONFIGURE ) begin
@@ -324,51 +344,54 @@ module lcd #(
                     end
                 LCD_STATE_READY: begin
                         // don't mess with the IO registers, an IO operation might still be running
-                        case ( command )
-                            LCD_COMMAND_CONFIGURE: begin
-                                    lcd_ready <= 0;
-                                    lcd_state <= LCD_STATE_CONFIGURE;
-                                    lcd_timer <= DelayTimerCount;
-                                end
-                            LCD_COMMAND_FILL_RECT,
-                            LCD_COMMAND_READ_RECT,
-                            LCD_COMMAND_WRITE_RECT: begin
-                                    // all of these require a rectangle to be specified
-                                    lcd_command <= command;
-                                    lcd_ready <= 0;
-                                    if ( command == LCD_COMMAND_FILL_RECT )
-                                        lcd_fill_pixel <= fill_pixel;
-                                    if ( ( rect_y0 != lcd_stored_y0 ) || ( rect_y1 != lcd_stored_y1 ) ) begin
-                                        // new Y!  save that fact in case we need to do X first
-                                        lcd_stored_y0 <= rect_y0;
-                                        lcd_stored_y1 <= rect_y1;
-                                        lcd_stored_y_new <= 1;
+                        // don't even start an operation if the abort line is up
+                        if ( ~abort ) begin
+                            case ( command )
+                                LCD_COMMAND_CONFIGURE: begin
+                                        lcd_ready <= 0;
+                                        lcd_state <= LCD_STATE_CONFIGURE;
+                                        lcd_timer <= DelayTimerCount;
                                     end
-                                    if ( ( rect_x0 != lcd_stored_x0 ) || ( rect_x1 != lcd_stored_x1 ) ) begin
-                                        // new X!  save the values and get set to write the address
-                                        lcd_stored_x0 <= rect_x0;
-                                        lcd_stored_x1 <= rect_x1;
-                                        lcd_state <= LCD_STATE_SET_X_RANGE;
-                                    end else begin
+                                LCD_COMMAND_FILL_RECT,
+                                LCD_COMMAND_READ_RECT,
+                                LCD_COMMAND_WRITE_RECT: begin
+                                        // all of these require a rectangle to be specified
+                                        lcd_command <= command;
+                                        lcd_ready <= 0;
+                                        if ( command == LCD_COMMAND_FILL_RECT )
+                                            lcd_fill_pixel <= fill_pixel;
                                         if ( ( rect_y0 != lcd_stored_y0 ) || ( rect_y1 != lcd_stored_y1 ) ) begin
-                                            // new Y (but not a new X)
-                                            lcd_state <= LCD_STATE_SET_Y_RANGE;
+                                            // new Y!  save that fact in case we need to do X first
+                                            lcd_stored_y0 <= rect_y0;
+                                            lcd_stored_y1 <= rect_y1;
+                                            lcd_stored_y_new <= 1;
+                                        end
+                                        if ( ( rect_x0 != lcd_stored_x0 ) || ( rect_x1 != lcd_stored_x1 ) ) begin
+                                            // new X!  save the values and get set to write the address
+                                            lcd_stored_x0 <= rect_x0;
+                                            lcd_stored_x1 <= rect_x1;
+                                            lcd_state <= LCD_STATE_SET_X_RANGE;
                                         end else begin
-                                            // same bounds as last time, just do the operation
-                                            case ( command )
-                                                LCD_COMMAND_FILL_RECT:
-                                                    lcd_state <= LCD_STATE_FILL_RECT;
-                                                LCD_COMMAND_READ_RECT:
-                                                    lcd_state <= LCD_STATE_READ_RECT;
-                                                LCD_COMMAND_WRITE_RECT:
-                                                    lcd_state <= LCD_STATE_WRITE_RECT;
-                                            endcase
+                                            if ( ( rect_y0 != lcd_stored_y0 ) || ( rect_y1 != lcd_stored_y1 ) ) begin
+                                                // new Y (but not a new X)
+                                                lcd_state <= LCD_STATE_SET_Y_RANGE;
+                                            end else begin
+                                                // same bounds as last time, just do the operation
+                                                case ( command )
+                                                    LCD_COMMAND_FILL_RECT:
+                                                        lcd_state <= LCD_STATE_FILL_RECT;
+                                                    LCD_COMMAND_READ_RECT:
+                                                        lcd_state <= LCD_STATE_READ_RECT;
+                                                    LCD_COMMAND_WRITE_RECT:
+                                                        lcd_state <= LCD_STATE_WRITE_RECT;
+                                                endcase
+                                            end
                                         end
                                     end
-                                end
-                            default: begin
-                                end
-                        endcase
+                                default: begin
+                                    end
+                            endcase
+                        end
                     end
                 LCD_STATE_SET_X_RANGE: begin
                         if ( lcd_io_tick == lcd_io_tock ) begin
@@ -476,37 +499,47 @@ module lcd #(
                     end
                 LCD_STATE_FILL_RECT: begin
                         if ( lcd_io_tick == lcd_io_tock ) begin
-                            lcd_io_tick <= !lcd_io_tick;
-                            lcd_io_dc <= LCD_IO_COMMAND;
-                            lcd_io_rw <= LCD_IO_WRITE;
-                            lcd_io_data <= { 10'H0, LCD_COMMAND_CODE_WRITE_MEMORY_START };
-                            lcd_x <= lcd_stored_x0;
-                            lcd_y <= lcd_stored_y0;
-                            lcd_x_origin <= 1;
-                            lcd_y_origin <= 1;
-                            lcd_state <= LCD_STATE_FILL_RECT_LOOP;
+                            if ( !lcd_aborted && !abort ) begin
+                                lcd_io_tick <= !lcd_io_tick;
+                                lcd_io_dc <= LCD_IO_COMMAND;
+                                lcd_io_rw <= LCD_IO_WRITE;
+                                lcd_io_data <= { 10'H0, LCD_COMMAND_CODE_WRITE_MEMORY_START };
+                                lcd_x <= lcd_stored_x0;
+                                lcd_y <= lcd_stored_y0;
+                                lcd_x_origin <= 1;
+                                lcd_y_origin <= 1;
+                                lcd_state <= LCD_STATE_FILL_RECT_LOOP;
+                            end else begin
+                                // clean up good...
+                                lcd_state <= LCD_STATE_WRITE_RECT_END_LOOP;
+                            end
                         end
                     end
                 LCD_STATE_FILL_RECT_LOOP: begin
                         if ( lcd_io_tick == lcd_io_tock ) begin
-                            lcd_io_tick <= !lcd_io_tick;
-                            lcd_io_data <= { 2'H0, lcd_fill_pixel };
-                            lcd_io_dc <= LCD_IO_DATA;
-                            if ( ( lcd_x == lcd_stored_x1 ) ) begin
-                                lcd_x <= lcd_stored_x0;
-                                lcd_x_origin <= 1;
-                                if ( ( lcd_y == lcd_stored_y1 ) ) begin
-                                    lcd_state <= LCD_STATE_READY;
-                                    lcd_y <= lcd_stored_y0;
-                                    lcd_y_origin <= 1;
-                                    lcd_ready <= 1;
+                            if ( !lcd_aborted && !abort ) begin
+                                lcd_io_tick <= !lcd_io_tick;
+                                lcd_io_data <= { 2'H0, lcd_fill_pixel };
+                                lcd_io_dc <= LCD_IO_DATA;
+                                if ( ( lcd_x == lcd_stored_x1 ) ) begin
+                                    lcd_x <= lcd_stored_x0;
+                                    lcd_x_origin <= 1;
+                                    if ( ( lcd_y == lcd_stored_y1 ) ) begin
+                                        lcd_state <= LCD_STATE_READY;
+                                        lcd_y <= lcd_stored_y0;
+                                        lcd_y_origin <= 1;
+                                        lcd_ready <= 1;
+                                    end else begin
+                                        lcd_y <= lcd_y + 1;
+                                    end
                                 end else begin
-                                    lcd_y <= lcd_y + 1;
+                                    lcd_y_origin <= 0;
+                                    lcd_x_origin <= 0;
+                                    lcd_x <= lcd_x + 1;
                                 end
                             end else begin
-                                lcd_y_origin <= 0;
-                                lcd_x_origin <= 0;
-                                lcd_x <= lcd_x + 1;
+                                // clean up good...
+                                lcd_state <= LCD_STATE_WRITE_RECT_END_LOOP;
                             end
                         end
                     end
@@ -516,41 +549,49 @@ module lcd #(
                 LCD_STATE_WRITE_RECT: begin
                         // seem familiar?  some dupe here..
                         if ( lcd_io_tick == lcd_io_tock ) begin
-                            lcd_io_tick <= !lcd_io_tick;
-                            lcd_io_dc <= LCD_IO_COMMAND;
-                            lcd_io_rw <= LCD_IO_WRITE;
-                            lcd_io_data <= { 10'H0, LCD_COMMAND_CODE_WRITE_MEMORY_START };
-                            lcd_x <= lcd_stored_x0;
-                            lcd_y <= lcd_stored_y0;
-                            lcd_x_origin <= 1;
-                            lcd_y_origin <= 1;
-                            lcd_state <= LCD_STATE_WRITE_RECT_LOOP;
+                            if ( !lcd_aborted && !abort ) begin
+                                lcd_io_tick <= !lcd_io_tick;
+                                lcd_io_dc <= LCD_IO_COMMAND;
+                                lcd_io_rw <= LCD_IO_WRITE;
+                                lcd_io_data <= { 10'H0, LCD_COMMAND_CODE_WRITE_MEMORY_START };
+                                lcd_x <= lcd_stored_x0;
+                                lcd_y <= lcd_stored_y0;
+                                lcd_x_origin <= 1;
+                                lcd_y_origin <= 1;
+                                lcd_state <= LCD_STATE_WRITE_RECT_LOOP;
+                            end else begin
+                                lcd_state <= LCD_STATE_WRITE_RECT_END_LOOP;
+                            end
                         end else begin
                             lcd_rect_pixel_write_ready <= 0;
                         end
                     end
                 LCD_STATE_WRITE_RECT_LOOP: begin // 19
                         if ( lcd_io_tick == lcd_io_tock ) begin
-                            if ( lcd_rect_pixel_write_ready && rect_pixel_write_valid ) begin
-                                lcd_rect_pixel_write_ready <= 0;
-                                lcd_io_dc <= LCD_IO_DATA;
-                                lcd_io_tick <= !lcd_io_tick;
-                                lcd_io_data <= { 2'H0, rect_pixel_write};
-                                if ( ( lcd_x == lcd_stored_x1 ) ) begin
-                                    if ( ( lcd_y == lcd_stored_y1 ) ) begin
-                                        lcd_state <= LCD_STATE_WRITE_RECT_END_LOOP;
+                            if ( !lcd_aborted && !abort ) begin
+                                if ( lcd_rect_pixel_write_ready && rect_pixel_write_valid ) begin
+                                    lcd_rect_pixel_write_ready <= 0;
+                                    lcd_io_dc <= LCD_IO_DATA;
+                                    lcd_io_tick <= !lcd_io_tick;
+                                    lcd_io_data <= { 2'H0, rect_pixel_write};
+                                    if ( ( lcd_x == lcd_stored_x1 ) ) begin
+                                        if ( ( lcd_y == lcd_stored_y1 ) ) begin
+                                            lcd_state <= LCD_STATE_WRITE_RECT_END_LOOP;
+                                        end else begin
+                                            lcd_x <= lcd_stored_x0;
+                                            lcd_x_origin <= 1;
+                                            lcd_y <= lcd_y + 1;
+                                        end
                                     end else begin
-                                        lcd_x <= lcd_stored_x0;
-                                        lcd_x_origin <= 1;
-                                        lcd_y <= lcd_y + 1;
+                                        lcd_y_origin <= 0;
+                                        lcd_x_origin <= 0;
+                                        lcd_x <= lcd_x + 1;
                                     end
                                 end else begin
-                                    lcd_y_origin <= 0;
-                                    lcd_x_origin <= 0;
-                                    lcd_x <= lcd_x + 1;
+                                    lcd_rect_pixel_write_ready <= 1;
                                 end
                             end else begin
-                                lcd_rect_pixel_write_ready <= 1;
+                                lcd_state <= LCD_STATE_WRITE_RECT_END_LOOP;
                             end
                         end
                     end
@@ -578,6 +619,9 @@ module lcd #(
     assign pixel_y = ( ~lcd_ready ) ? lcd_y : 0;
 
     assign rect_pixel_write_ready = lcd_rect_pixel_write_ready;
+
+    assign rect_pixel_read = lcd_rect_pixel_read;
+    assign rect_pixel_read_valid = lcd_rect_pixel_read_valid;
 
     assign debug[7:0] = { 2'H0, lcd_io_state[0], lcd_rs, lcd_rectangle, lcd_y_origin, lcd_x_origin, lcd_wr };
 
