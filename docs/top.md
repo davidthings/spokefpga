@@ -8,6 +8,13 @@ header:
   overlay_image: /assets/images/spokefpga_banner_dim.png
 feature_row:
 
+  - image_path: /assets/images/microfpga_slides.png
+    alt: "Superconference 2019 Talk"
+    title: "Superconference 2019 Talk Slides"
+    excerpt: "Slides to go with the Video"
+    url: "/hackaday_slides_2019_11_12/"
+    btn_label: "View"
+    btn_class: "btn--inverse"
   - image_path: /assets/images/hackaday_logo_sm.png
     alt: "Superconference 2019 Badge"
     title: "Superconference 2019 Badge"
