@@ -1,0 +1,81 @@
+
+@import url(../../lib/font/source-sans-pro/source-sans-pro.css);
+
+.btn {
+    /* default */
+    display: inline-block;
+    margin-bottom: 0.1em;
+    padding: 0.25em 0.5em;
+    font-size: 1em;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    font-family: "Source Sans Pro", Helvetica, sans-serif;
+    border-width: 0;
+    border-radius: 5;
+    cursor: pointer;
+
+    border: 1px solid #700;
+
+    .icon {
+      margin-right: 0.5em;
+    }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  /* position: absolute;
+  top: 10%;
+  left: 50%; */
+  text-align: center;
+  margin: 0 0 0 0;
+  color: #222;
+  font-family: "Source Sans Pro", Helvetica, sans-serif;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: normal;
+  /*text-transform: uppercase;*/
+  text-shadow: none;
+  word-wrap: break-word; }
+
+h1 {
+  font-size: 8em;
+}
+
+h1.white {
+    color:#FFF;
+}
+
+h1.shadow {
+    text-shadow: 0px 0px 20px black;
+}
+
+h1.wshadow {
+    text-shadow: 0px 0px 10px white;
+}
+
+h1.huge {
+      font-size: 8em;
+}
+
+h1.big {
+    font-size: 5em;
+}
+
+h2 {
+  font-size: 1.6em; }
+
+h2.shadow {
+    text-shadow: 0px 0px 10px black;
+}
+h2.wshadow {
+    text-shadow: 0px 0px 10px white;
+}
+
+h2.huge {
+    font-size: 3em;
+}

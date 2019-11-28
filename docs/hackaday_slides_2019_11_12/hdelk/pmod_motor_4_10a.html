@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+    <head>
+            <link rel="stylesheet" href="css/hdelk.css">
+    </head>
+<body>
+
+    <script src="js/elk.bundled.js"></script>
+    <script src="js/svg.min.js"></script>
+    <script src="js/hdelk.js"></script>
+
+    <!-- <div style="text-align: center;">    <h1>INSIDE</h1></div> -->
+
+    <div style="margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); zoom:2.0;" id="badge_soc"></div>
+
+    <div id="pmod_motor_4_10a_design"></div>
+
+    <script type="text/javascript">
+
+        var graph = {
+            color: "#555",
+            children: [
+                { id: "FPGA",
+                    children: [
+                        { id: "to_host", label:"to host", port:1 },
+                        { id: "from_host", label:"from host", port:1 },
+                        { id: "to_from_sr", label:"to/from SR", port:1 },
+                        { id: "to_from_adx", label:"to/from ADX", port:1 },
+                        { id: "PWM-out", type:"match", inPorts:["in"], outPorts:[ "out" ], southPorts:[ "match" ]  },
+                        { id: "ADX-out", type:"match", inPorts:["in"], outPorts:[ "out" ], southPorts:[ "match" ] },
+                        { id: "ADX", type:"adx driver", inPorts:["in"], outPorts:[ "out", "adx" ] },
+                        { id: "PWM", type:"pwm driver", inPorts:["in"], outPorts:[ "pwm" ] },
+                        { id: "SR", type:"sr driver", inPorts:["in"], outPorts:[ "out", "sr" ] },
+                        { id: "SR-in", type:"unmatch", inPorts:["in"], outPorts:[ "out" ], northPorts:[ "unmatch" ]  },
+                        { id: "ADX-in", type:"unmatch", inPorts:["in"], outPorts:[ "out" ], northPorts:[ "unmatch" ] }
+                    ],
+                    edges: [
+                        ["from_host","PWM-out.in"],
+                        ["PWM-out.out","ADX-out.in"],
+                        ["ADX-out.match","ADX.in"],
+                        ["ADX.adx","to_from_adx"],
+                        ["ADX.out","ADX-in.unmatch"],
+                        ["PWM-out.match","PWM.in"],
+                        ["PWM.pwm","SR.in"],
+                        ["SR.sr","to_from_sr"],
+                        ["SR.out","SR-in.unmatch"],
+                        ["ADX-in.out","SR-in.in"],
+                        ["SR-in.out","to_host"]
+                    ]
+                }
+            ]
+        }
+
+        hdelk.layout( graph, "pmod_motor_4_10a_design" );
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+            <link rel="stylesheet" href="../css/theme/white.css">
+            <link rel="stylesheet" href="css/hdelk.css">
+    </head>
+<body>
+
+    <script src="js/elk.bundled.js"></script>
+    <script src="js/svg.min.js"></script>
+    <script src="js/hdelk.js"></script>
+
+
+    <div style="margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); zoom:3.0;" id="simple_diagram"></div>
+
+
+<script type="text/javascript">
+
+    simple_graph = {
+        children: [
+            { id: "application", highlight:1, type:"VERILOG" },
+            { id: "Tools", highlight:1, label:"", height:80, inPorts: [ { id:"v", label:" " } ], outPorts:[ { id:"bits", label:" " }  ],
+                children: [
+                    { id: "Synthesis", highlight:2 },
+                    { id: "PlaceAndRoute", highlight:3 },
+                    { id: "Pack", highlight:4 },
+                ],
+                edges:[
+                    ["Tools.v", "Synthesis" ],
+                    ["Synthesis", "PlaceAndRoute" ],
+                    ["PlaceAndRoute", "Pack" ],
+                    ["Pack", "Tools.bits" ],
+                ]
+            },
+            { id: "configuration", highlight:1, type:"BITSTREAM" }
+        ],
+        edges: [ ["application","Tools.v"], ["Tools.bits","configuration"] ]
+    };
+    hdelk.layout( simple_graph, "simple_diagram" );
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg viewBox="0 0 1040 330"
+     clip="0 1040 330 0"
+     preserveAspectRatio="xMidYMid meet"
+     version="1.1"
+     baseProfile="full"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     xmlns:ev="http://www.w3.org/2001/xml-events"
+     xml:space="preserve">
+<title>add_accum</title>
+<desc>Nlview schematic (SVG)</desc>
+<clipPath id="clippingbbox">
+<rect x="0" y="0" width="1040" height="330" />
+</clipPath>
+<g stroke="black"
+   stroke-width="2"
+   stroke-linecap="butt"
+   stroke-linejoin="miter"
+   stroke-miterlimit="4"
+   stroke-dasharray="none"
+   stroke-dashoffset="0"
+   fill="none"
+   font-family="Helvetica"
+   font-style="normal"
+   font-size="12"
+   writing-mode="lr-tb"
+   cursor="crosshair"
+   clip-path="url(#clippingbbox)">
+<path d="M0 0h1040v331h-1040z" stroke="none" fill="white" />
+<g>
+<path d="M80 20l-7 7h-14v-14h14z" />
+<text x="55" y="20" fill="black" stroke-width="0" text-anchor="end" dy="3.85">reset</text>
+<path d="M768 88h78v80h-78z" stroke="none" fill="darkgrey" />
+<path d="M768 88h78v80h-78z" />
+<path d="M764 84h78v80h-78z" stroke="none" fill="#d4d4d4" />
+<path d="M764 84h78v80h-78z" />
+<path d="M760 80h78v80h-78z" stroke="none" fill="white" />
+<path d="M760 80h78v80h-78z" />
+<path d="M760 123l7 -3l-7 -3" />
+<text x="790" y="78" fill="black" stroke-width="0">accumsum</text>
+<path d="M750 120h10" />
+<text x="769" y="120" fill="black" stroke-width="0" font-size="10" dy="3.25">clock</text>
+</g>
+<g stroke-width="3">
+<path d="M750 100h10" />
+<text x="762" y="100" fill="black" stroke-width="0" font-size="10" dy="3.25">d[7:0]</text>
+<path d="M780 70v10" />
+<text x="786" y="82" fill="black" stroke-width="0" font-size="10" text-anchor="middle" dy="6.5">set[7:0]</text>
+<text x="778" y="78" fill="black" stroke-width="0" text-anchor="end">8&apos;b0</text>
+<path d="M780 170v-10" />
+<text x="792" y="158" fill="black" stroke-width="0" font-size="10" text-anchor="middle">reset[7:0]</text>
+<text x="778" y="170" fill="black" stroke-width="0" text-anchor="end" dy="7.7">8&apos;b0</text>
+<path d="M850 100h-12" />
+<text x="836" y="100" fill="black" stroke-width="0" font-size="10" text-anchor="end" dy="3.25">q[7:0]</text>
+<path d="M578 48l40 15v30l-40 15z" stroke="none" fill="darkgrey" />
+</g>
+<g>
+<path d="M578 48l40 15v30l-40 15z" />
+<path d="M574 44l40 15v30l-40 15z" stroke="none" fill="#d4d4d4" />
+<path d="M574 44l40 15v30l-40 15z" />
+<path d="M570 40l40 15v30l-40 15z" stroke="none" fill="white" />
+<path d="M570 40l40 15v30l-40 15z" />
+<text x="594" y="46" fill="black" stroke-width="0">accumsum_7__I_0</text>
+<path d="M590 40v8" />
+<text x="588" y="40" fill="black" stroke-width="0" font-size="10" text-anchor="end">cond</text>
+</g>
+<g stroke-width="3">
+<path d="M560 60h10" />
+<text x="568" y="59" fill="black" stroke-width="0" font-size="10" text-anchor="end">d0[7:0]</text>
+<path d="M560 80h10" />
+<text x="568" y="79" fill="black" stroke-width="0" font-size="10" text-anchor="end">d1[7:0]</text>
+<text x="522" y="79" fill="black" stroke-width="0" text-anchor="end">8&apos;b0</text>
+<path d="M620 70h-10" />
+<text x="620" y="69" fill="black" stroke-width="0" font-size="10">o[7:0]</text>
+</g>
+<g>
+<path d="M80 120l-7 7h-14v-14h14z" />
+<text x="55" y="120" fill="black" stroke-width="0" text-anchor="end" dy="3.85">clock</text>
+<path d="M80 140l-7 7h-14v-14h14z" />
+<text x="55" y="140" fill="black" stroke-width="0" text-anchor="end" dy="3.85">valid</text>
+<path d="M368 168l40 15v30l-40 15z" stroke="none" fill="darkgrey" />
+<path d="M368 168l40 15v30l-40 15z" />
+<path d="M364 164l40 15v30l-40 15z" stroke="none" fill="#d4d4d4" />
+<path d="M364 164l40 15v30l-40 15z" />
+<path d="M360 160l40 15v30l-40 15z" stroke="none" fill="white" />
+<path d="M360 160l40 15v30l-40 15z" />
+<text x="384" y="166" fill="black" stroke-width="0">mux_4</text>
+<path d="M380 160v8" />
+<text x="378" y="160" fill="black" stroke-width="0" font-size="10" text-anchor="end">cond</text>
+</g>
+<g stroke-width="3">
+<path d="M350 180h10" />
+<text x="358" y="179" fill="black" stroke-width="0" font-size="10" text-anchor="end">d0[7:0]</text>
+<path d="M350 200h10" />
+<text x="358" y="199" fill="black" stroke-width="0" font-size="10" text-anchor="end">d1[7:0]</text>
+<path d="M410 190h-10" />
+<text x="410" y="189" fill="black" stroke-width="0" font-size="10">o[7:0]</text>
+<path d="M900 100v-7h14l7 7l-7 7h-14z" />
+<text x="925" y="100" fill="black" stroke-width="0" dy="3.85">accumsum[7:0]</text>
+<path d="M160 250l-10 -7v-28l70 18v34l-70 18v-28z" stroke="none" fill="white" />
+</g>
+<g>
+<path d="M160 250l-10 -7v-28l70 18v34l-70 18v-28z" />
+<text x="162" y="250" fill="black" stroke-width="0" dy="3.85">+</text>
+<text x="174" y="218" fill="black" stroke-width="0">add_3</text>
+<text x="174" y="282" fill="black" stroke-width="0" dy="7.7">add_8u_8u</text>
+</g>
+<g stroke-width="3">
+<path d="M230 250h-10" />
+<text x="218" y="250" fill="black" stroke-width="0" font-size="10" text-anchor="end" dy="3.25">o[7:0]</text>
+<path d="M140 230h10" />
+<text x="152" y="233" fill="black" stroke-width="0" font-size="10" dy="3.25">a[7:0]</text>
+<path d="M140 270h10" />
+<text x="152" y="267" fill="black" stroke-width="0" font-size="10" dy="3.25">b[7:0]</text>
+</g>
+<g>
+<path d="M170 210v10" />
+<text x="168" y="212" fill="black" stroke-width="0" font-size="10" text-anchor="end">cin</text>
+<text x="168" y="198" fill="black" stroke-width="0" transform="rotate(-90 168 198)">1&apos;b0</text>
+<path d="M170 290v-10" />
+<text x="168" y="288" fill="black" stroke-width="0" font-size="10" text-anchor="end" dy="6.5">cout</text>
+</g>
+<g stroke-width="3">
+<path d="M80 270l-7 7h-14v-14h14z" />
+<text x="55" y="270" fill="black" stroke-width="0" text-anchor="end" dy="3.85">x[3:0]</text>
+</g>
+<g>
+<path d="M112 310h16" />
+<path d="M115 313h10" />
+<path d="M118 316h4" />
+</g>
+<g stroke-width="3">
+<path d="M140 230h-40v-70h190v80h590v-140h-30" />
+<path d="M880 100h20" />
+<path d="M877 97h7v7h-7z" stroke="none" fill="black" />
+<path d="M290 180h60" />
+<path d="M287 177h7v7h-7z" stroke="none" fill="black" />
+<path d="M620 70h110v30h20" />
+<path d="M410 190h60v-130h90" />
+</g>
+<g>
+<path d="M80 120h670" />
+</g>
+<g stroke-width="2">
+<path d="M140 270h-15" />
+</g>
+<g stroke="#a07560">
+<path d="M125 270l-5 5" />
+</g>
+<g>
+<path d="M120 275v35" />
+</g>
+<g stroke-width="3">
+<path d="M230 250h40v-50h80" />
+</g>
+<g>
+<path d="M80 20h510v20" />
+<path d="M80 140h300v20" />
+</g>
+<g stroke-width="3">
+<path d="M80 270h20" />
+</g>
+<g stroke="#a07560" stroke-width="3">
+<path d="M100 270h5" />
+</g>
+<g stroke-width="3">
+<path d="M105 270h35" />
+</g>
+</g>
+</svg>

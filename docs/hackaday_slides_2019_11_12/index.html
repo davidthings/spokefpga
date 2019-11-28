@@ -1,0 +1,2053 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>MicroFPGA</title>
+
+		<link rel="stylesheet" href="css/reset.css">
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/white.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/monokai.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+
+
+<section data-background-image="./images/spoke_large.png" data-background-opacity=0.9>
+        <h1 class="huge white shadow ">MicroFPGA</h1>
+
+        <h2 class="huge white shadow">THE COMING REVOLUTION IN SMALL ELECTRONICS</h2>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # WALKER
+
+        <img class="img-75"  src="images/start/quad_robot.png"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+        <textarea data-template>
+            # 3D PRINTING AND RAW MATERIALS
+
+            <img class="img-75"  src="images/start/ExampleUniversalFrame.png"></img>
+
+        </textarea>
+    </section>
+
+<section data-markdown>
+    <textarea data-template>
+        # MODULAR JOINTS
+
+        <img class="img-50"  src="images/start/big_tube_core_render.png"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+        <textarea data-template>
+            # WITH BIG FAT STEPPERS
+
+            <img class="img-50"  src="images/start/big_tube_nut_holes.png"></img>
+
+        </textarea>
+    </section>
+
+<section data-markdown>
+        <textarea data-template>
+            # NETWORKS OF SENSORS AND ACTUATORS
+
+            <img class="img-75"  src="images/intro/robot_architecture.svg"></img>
+
+        </textarea>
+    </section>
+
+<section data-markdown>
+        <textarea data-template>
+            # BUT
+
+            <img class="img-25"  src="images/intro/robo_sad.svg"></img>
+
+            <p class="fragment">Communications too slow</p>
+            <p class="fragment">Not enough GPIO at microcontrollers</p>
+            <p class="fragment">FPGA-curious?!</p>
+
+        </textarea>
+    </section>
+
+<section data-markdown>
+    <textarea data-template>
+        #  AREN'T FPGAS EXPENSIVE & INTIMIDATING?
+
+        <img class="img-33"  src="images/fpgas/vcu129-angled.jpg"></img>
+        <img class="img-33" src="images/fpgas/vivado_block.png"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # NEW BOARD OPTIONS
+
+        **NEW!** Smaller boards, for smaller applications
+
+        <img class="img-25" src="images/fpgas/TinyFPGA_BX_Board-01.jpg"></img>
+        <img class="img-25" src="images/fpgas/fomu-front-back-03_png_project-body.jpg"></img>
+        <img class="img-25" src="images/fpgas/icebreaker-iso.jpg"></img>
+
+        <p class="fragment" >TinyFPGA BX $45, Fomu $45, iCEBreaker $65</p>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # OPEN SOURCE TOOLS
+
+        **NEW!** Fast open source tools and libraries
+
+        <img class="img-50 "   src="images/fpgas/nextpnr-ice40.png"></img>
+
+        <!-- <img class="img-33" src="images/fpgas/next-pnr-closeup.png"></img> -->
+
+        <p class="fragment" >eg. Yosys, NextPnR, IceStudio, Migen </p>
+
+    </textarea>
+</section>
+
+<!-- <section data-markdown>
+        <textarea data-template>
+            # A Word About the Title
+
+            **"MicroFPGA"** - not that intimidating expensive stuff
+
+            **"The Coming Revolution in Small Electronics"** - The argument to be advanced here
+
+        </textarea>
+    </section> -->
+
+<section  data-background-image="./images/spoke_large.png" data-background-opacity=0.9>
+    <h1 class="big white shadow">What Is An FPGA?</h1>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # DISCRETE LOGIC
+
+        <img class="img-50" src="images/intro/NV_0417_Julstrom_Figure03.jpg"></img>
+
+        <p class="mini">https://www.nutsvolts.com/magazine/article/April2017_CMOS-ICs-Digital-Clock</p>
+
+        MC4543 - BCD-to-Seven Segment Latch/Decoder/Driver
+    </textarea>
+</section>
+
+<!-- <section data-markdown>
+    <textarea data-template>
+        # DISCRETE CPU
+
+        <img class="img-33" src="images/fpgas/CSCvon8.jpg"></img>
+        <img class="img-33" src="images/fpgas/CSCvon8.png"></img>
+
+        <p class="mini">https://hackaday.io/project/165950-cscvon8-an-8-bit-ttl-cpu</p>
+        <p class="mini">https://github.com/DoctorWkt/CSCvon8</p>
+    </textarea>
+</section> -->
+
+<section>
+    <h1>NATIONAL SEMICONDUCTOR SC/MP</h1>
+
+        <img class="img-33" src="images/fpgas/1118px-NS_SC-MP-2_die.jpeg"></img>
+        <img class="img-25" src="images/fpgas/scmp_block.png"></img>
+
+        <p class="micro">Photo by <a href="//commons.wikimedia.org/wiki/User:Birdman86" title="User:Birdman86">Pauli Rautakorpi</a> - <span class="int-own-work" lang="en">Own work</span>, <a href="https://creativecommons.org/licenses/by/3.0" title="Creative Commons Attribution 3.0">CC BY 3.0</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=46171401">Link</a></p>
+
+        <p>Simple Cost-effective Micro Processor.  1974.  1MHz - 4MHz</p>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # STM32 "BLUE PILL"
+
+        <img class="img-75" src="images/mcus/stm32_pinout.png"></img>
+
+    </textarea>
+</section>
+
+<!--
+<section>
+        <h3>What is an FPGA?</h3>
+        <h1>ARM 610</h1>
+
+        <img class="img-25" src="images/fpgas/1920px-GPS_ARM610_die.jpeg"></img>
+
+        <img class="img-33" src="images/fpgas/arm610_block_diagram.svg"></img>
+        <img class="img-33" src="images/fpgas/arm6_block_diagram.svg"></img>
+
+        <p class="micro">Photo by <a href="//commons.wikimedia.org/wiki/User:Birdman86" title="User:Birdman86">Pauli Rautakorpi</a> - <span class="int-own-work" lang="en">Own work</span>, <a href="https://creativecommons.org/licenses/by/3.0" title="Creative Commons Attribution 3.0">CC BY 3.0</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=33594601">Link</a></p>
+
+        1994 - ARM w/MMU & 32b Address Space 25-33MHz 0.8um (800nm process!)
+</section> -->
+
+<!-- <section>
+        <h1>INTEL ICE LAKE</h1>
+
+        <img class="img-33" src="images/fpgas/Intel-Ice-Lake-Die-Shot.png"></img>
+
+        <img class="img-25" src="images/fpgas/Intel_Ice_Lake_explained.png"></img>
+
+        <p>2019 - Mobile 10nm, 4 Core 64b Processor 2.3GHz, GPU 4K@120Hz, </p>
+</section> -->
+
+<section>
+        <h1>FPGA</h1>
+
+        <img class="img-33" src="images/fpgas/fpga_hiveminer.jpg"></img>
+
+        <p class="micro">https://www.flickr.com/photos/htomari/22054207552/</p>
+
+        <h3>FIELD PROGRAMMABLE GATE ARRAY</h3>
+</section>
+
+<section data-markdown>
+        <textarea data-template>
+            # HARDWARE DESCRIPTION LANGUAGE
+
+            <img class="img-50" src="images/fpgas/fpga_verilog.svg"></img>
+
+            ### VERILOG
+        </textarea>
+    </section>
+
+<section data-markdown>
+        <textarea data-template>
+            # REGISTER TRANSFER LANGUAGE
+
+            <img class="img-75" src="images/fpgas/fpga_rtl.svg"></img>
+
+        </textarea>
+    </section>
+
+<section data-markdown>
+    <textarea data-template>
+        # HARDWARE
+
+        <img class="img-75" src="images/fpgas/fpga_physical.svg"></img>
+
+    </textarea>
+</section>
+
+<section data-background-iframe="sozi/fpga_physical.sozi.html" data-background-interactive>
+    <div style="position: absolute; width: 1%; right: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.5), 0 5px 25px rgba(0,0,0,0.2); background-color: rgba(60, 60, 60, 0.9); color: #fff; padding: 20px; font-size: 20px; text-align: right;">
+    </div>
+</section>
+
+<!-- <section data-markdown>
+    <textarea data-template>
+        # Yosys
+
+        <img class="img-75" src="images/fpgas/yosys_data_flow.png"></img>
+
+        Details of the internals make you happy there are people who like this...
+
+    </textarea>
+</section> -->
+
+    <!-- <section data-markdown>
+        <textarea data-template>
+            # SYNTHESIS
+
+            <img class="img-50" src="images/fpgas/yosys_frontend.png"></img>
+
+        Details of the internals make you happy there are people who like this..
+
+    </textarea>
+</section> -->
+<!--
+<section data-markdown>
+    <textarea data-template>
+        ## SYNTHESIS
+
+        # ADD_SAT( )
+``` verilog
+module add_sat( x, y, satsum )
+  parameter limit = 8'H7F;
+  input [7:0] x;
+  input [7:0] y;
+  output reg [7:0] satsum;
+
+  always @(*) begin
+    if ( x + y > limit)
+      satsum = limit;
+    else
+      satsum = x + y;
+  end
+endmodule
+```
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        ## SYNTHESIS
+
+        # PARSE
+
+        <img class="img" src="code/add_sat_load.svg"></img>
+
+    </textarea>
+</section>
+
+
+<section data-markdown>
+    <textarea data-template>
+        ## SYNTHESIS
+
+        # PROC
+
+<img class="img" src="code/add_sat_proc.svg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        ## SYNTHESIS
+
+        # OPT
+
+<img class="img" src="code/add_sat_opt.svg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        ## SYNTHESIS
+
+        # FINAL
+
+<img class="img-33" src="code/add_sat_synth_ecp5.svg"></img>
+
+    </textarea>
+</section>
+
+<section data-background-iframe="sozi/add_sat_synth_ecp5.sozi.html" data-background-interactive>
+    <div style="position: absolute; width: 5%; right: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.5), 0 5px 25px rgba(0,0,0,0.2); background-color: rgba(60, 60, 60, 0.9); color: #fff; padding: 20px; font-size: 20px; text-align: right;">
+    </div>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        ## PLACE AND ROUTE
+        # NEXTPNR
+
+        <img class="img-33" src="code/add_sat_synth_ecp5.svg"></img>
+        <img class="img-50" src="code/add_sat_nextpnr.png"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        ## PLACE AND ROUTE
+
+        # LATTICE DIAMOND
+
+<img class="img-50" src="code/add_sat_lattice_physical.png"></img>
+
+    </textarea>
+</section>
+
+
+<section data-markdown>
+    <textarea data-template>
+        ## SYNTHESIS
+
+        # LATTICE DIAMOND
+
+<img class="img-50" src="code/add_sat_lattice_z1.png"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        ## SYNTHESIS
+
+        # LATTICE DIAMOND
+
+<img class="img-50" src="code/add_sat_lattice_z2.png"></img>
+
+    </textarea>
+</section> -->
+
+<section data-markdown>
+        <textarea data-template>
+            # TOOLS
+
+            <img class="img-75" src="images/fpgas/fpga_tools.svg"></img>
+
+            Open Source Tools
+
+            <img class="img-75" src="images/coding/symbiflow.svg"></img>
+
+        </textarea>
+    </section> 
+
+<section data-markdown>
+    <textarea data-template>
+
+        # MODULE
+``` verilog
+module add_accum( clock, reset, x, valid, accumsum );
+  input clock, reset;
+  input [3:0] x;
+  input valid;
+  output reg [7:0] accumsum;
+
+  always @(posedge clock) begin
+    if ( reset )
+      accumsum <= 0;
+    else
+      if ( valid )
+       accumsum <= accumsum + x;
+  end
+endmodule
+```
+
+After RESET, on each CLOCK tick,
+
+if VALID, add X to ACCSUM
+
+    </textarea>
+</section>
+
+<section data-markdown data-transition="slide-in none-out">
+    <textarea data-template>
+        # YOSYS - PARSE
+
+        <img class="img-75" src="images/fpgas/add_accum_parse_00.svg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown data-transition="none">
+    <textarea data-template>
+        # YOSYS - PROC
+
+        <img class="img-75" src="images/fpgas/add_accum_proc_01.svg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown data-transition="none">
+<textarea data-template>
+        # YOSYS - CLEAN
+
+        <img class="img-75" src="images/fpgas/add_accum_clean_02.svg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown data-transition="none">
+    <textarea data-template>
+        # YOSYS - ALUMACC
+
+        <img class="img-75" src="images/fpgas/add_accum_alumacc_03.svg"></img>
+
+        Strap in...
+
+    </textarea>
+</section>
+
+<section data-markdown data-transition="none">
+    <textarea data-template>
+        # YOSYS - TM ARITH
+
+        <img class="img-33" src="images/fpgas/add_accum_tm_arith_04.svg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown data-transition="none">
+    <textarea data-template>
+        # YOSYS - ABC
+
+        <img class="img-50" src="images/fpgas/add_accum_abc_05.svg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown data-transition="none">
+    <textarea data-template>
+        # YOSYS - CLEAN
+
+        <img class="img-33" src="images/fpgas/add_accum_clean_06.svg"></img>
+
+    </textarea>
+</section>
+
+<!-- <section data-markdown data-transition="none">
+    <textarea data-template>
+        # YOSYS - TM CELLS
+
+        <img class="img-33" src="images/fpgas/add_accum_tm_cells_07.svg"></img>
+
+    </textarea>
+</section> -->
+
+<section data-markdown data-transition="none">
+    <textarea data-template>
+        # YOSYS - FFINIT
+
+        <img class="img-33" src="images/fpgas/add_accum_ffinit_08.svg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown data-transition="none">
+    <textarea data-template>
+        # YOSYS - CLEAN
+
+        <img class="img-33" src="images/fpgas/add_accum_opt_clean_09.svg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown data-transition="none">
+    <textarea data-template>
+        # YOSYS ABC
+
+        <img class="img-50" src="images/fpgas/add_accum_abc_10.svg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown data-transition="none">
+    <textarea data-template>
+        # YOSYS - ABC LUT
+
+        <img class="img-50" src="images/fpgas/add_accum_abc_lut_11.svg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown data-transition="none">
+    <textarea data-template>
+        # YOSYS - CLEAN
+
+        <img class="img-50" src="images/fpgas/add_accum_clean_12.svg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown data-transition="none">
+    <textarea data-template>
+        # YOSYS - TM CELLS
+
+        <img class="img-33" src="images/fpgas/add_accum_tm_cells_13.svg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown data-transition="none-in slide-out">
+    <textarea data-template>
+        # YOSYS - CLEAN - FINAL
+
+        <img class="img-33" src="images/fpgas/add_accum_clean_14.svg"></img>
+
+    </textarea>
+</section>
+
+<section data-background-iframe="sozi/add_accum_synth_ecp5.sozi.html" data-background-interactive data-transition="none-in slide-out">
+    <div style="position: absolute; width: 1%; right: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.5), 0 5px 25px rgba(0,0,0,0.2); background-color: rgba(60, 60, 60, 0.9); color: #fff; padding: 20px; font-size: 20px; text-align: right;">
+    </div>
+</section>
+
+
+<!--
+<section data-markdown data-transition="slide">
+    <textarea data-template>
+        # PLACE AND ROUTE
+
+        <img class="img-33" src="images/fpgas/add_accum_clean_14.svg"></img>
+        <img class="img-33" src="images/fpgas/add_accum_nextpnr.png"></img>
+
+    </textarea>
+</section>
+<section data-markdown>
+        <textarea data-template>
+            ### FPGA BASICS
+
+            # DIAMOND
+
+    ``` verilog
+    module add_accum( clock, reset, x, valid, accumsum );
+      input clock, reset;
+      input [3:0] x;
+      input valid;
+      output reg [7:0] accumsum;
+
+      always @(posedge clock) begin
+        if ( reset )
+          accumsum <= 0;
+        else
+          if ( valid )
+           accumsum <= accumsum + x;
+      end
+    endmodule
+    ```
+        </textarea>
+    </section>
+
+
+<section data-markdown data-transition="slide">
+        <textarea data-template>
+            ### DIAMOND
+            # PARSE
+
+            <img class="img-75" src="images/fpgas/add_accum_diamond_rtl.svg"></img>
+
+        </textarea>
+    </section>
+
+<section data-markdown data-transition="slide">
+        <textarea data-template>
+            ### DIAMOND
+            # TECH RTL
+
+            <img class="img-75" src="images/fpgas/add_accum_diamond_tech_rtl.svg"></img>
+
+        </textarea>
+    </section> -->
+
+
+<!-- This is the manual zooming I did before I learned how to do it properly in Sozi
+<section data-markdown data-transition="slide-in none-out">
+        <textarea data-template >
+            ## DIAMOND PNR
+
+            <img class="img-75" src="images/fpgas/add_accum_pnr_0_.png"></img>
+
+        </textarea>
+    </section>
+
+<section data-markdown  data-transition="none">
+        <textarea data-template>
+            ## DIAMOND PNR
+
+            <img class="img-75" src="images/fpgas/add_accum_pnr_1_.png"></img>
+
+        </textarea>
+    </section>
+
+<section data-markdown  data-transition="none">
+        <textarea data-template>
+            ## DIAMOND PNR
+
+            <img class="img-75" src="images/fpgas/add_accum_pnr_2_.png"></img>
+
+        </textarea>
+    </section>
+
+<section data-markdown  data-transition="none">
+        <textarea data-template>
+            ## DIAMOND PNR
+
+            <img class="img-75" src="images/fpgas/add_accum_pnr_3_.png"></img>
+
+        </textarea>
+    </section>
+
+<section data-markdown  data-transition="none">
+        <textarea data-template>
+            ## DIAMOND PNR
+
+            <img class="img-75" src="images/fpgas/add_accum_pnr_4_.png"></img>
+
+        </textarea>
+    </section>
+
+<section data-markdown  data-transition="none">
+    <textarea data-template>
+        ## DIAMOND PNR
+
+        <img class="img-75" src="images/fpgas/add_accum_pnr_5_.png"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown  data-transition="none">
+        <textarea data-template>
+            ## DIAMOND PNR
+
+            <img class="img-75" src="images/fpgas/add_accum_pnr_6_.png"></img>
+
+        </textarea>
+    </section>
+
+<section data-markdown  data-transition="none">
+        <textarea data-template>
+            ## DIAMOND PNR
+
+            <img class="img-75" src="images/fpgas/add_accum_pnr_7_.png"></img>
+
+        </textarea>
+    </section>
+
+<section data-markdown  data-transition="none">
+    <textarea data-template>
+        ## DIAMOND PNR
+
+        <img class="img-75" src="images/fpgas/add_accum_pnr_3_.png"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown  data-transition="none">
+    <textarea data-template>
+        ## DIAMOND PNR
+
+        <img class="img-75" src="images/fpgas/add_accum_pnr_8.png"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown  data-transition="none-in slide-out">
+    <textarea data-template>
+        ## DIAMOND PNR
+
+        <img class="img-75" src="images/fpgas/add_accum_pnr_9.png"></img>
+
+    </textarea>
+</section> -->
+
+<section data-markdown>
+    <textarea data-template>
+        # PLACE AND ROUTE
+
+        <img class="img-75" src="images/fpgas/fpga_physical.svg"></img>
+
+
+        Now we know *what* is going on the FPGA, *where* should it go?
+    </textarea>
+</section>
+
+
+<section data-background-iframe="sozi/add_accum_diamond_pnr.sozi.html" data-background-interactive>
+    <div style="position: absolute; width: 1%; right: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.5), 0 5px 25px rgba(0,0,0,0.2); background-color: rgba(60, 60, 60, 0.9); color: #fff; padding: 20px; font-size: 20px; text-align: right;">
+    </div>
+</section>
+
+<!-- <section data-markdown  data-transition="none-in slide-out">
+    <textarea data-template>
+        # ACCUMSUM[0]
+
+        <img class="img-50" src="images/fpgas/add_accum_pnr_7.png"></img>
+
+    </textarea>
+</section> -->
+
+<!-- <section data-markdown data-transition="slide_in">
+        <textarea data-template>
+            # CONSTRAINTS
+
+            <img class="img-33" src="images/fpgas/fpga_bg381.jpeg"></img>
+            <img class="img-33" src="images/fpgas/85F_BGA381.png"></img>
+
+        </textarea>
+    </section> -->
+
+    <!--
+<section data-markdown>
+        <textarea data-template>
+            # SIZE
+
+            Show some example codebases
+        </textarea>
+    </section>
+
+<section data-markdown>
+        <textarea data-template>
+            # OPTIMIZING
+
+            Show unconnected output => buh bye
+        </textarea>
+    </section>
+
+<section data-markdown>
+        <textarea data-template>
+            # CROSS PLATFORM
+
+            Same code on different processors
+        </textarea>
+    </section>
+
+<section data-markdown>
+        <textarea data-template>
+            # SCALE
+
+            Um
+        </textarea>
+    </section>
+
+<section data-markdown>
+        <textarea data-template>
+            # TESTING / SIMULATION
+
+            Essential Steps
+        </textarea>
+    </section> -->
+
+    <!-- 
+<section  data-background-image="./images/spoke_large.png" data-background-opacity=0.9>
+    <h1 class="big white shadow">FPGA Applications</h1>
+</section>
+<section data-markdown>
+    <textarea data-template>
+        # GLUE LOGIC
+
+        <img class="img-50" src="images/fpgas/fpga_glue_logic.svg"></img>
+
+        (FPGA in Dark Gray)
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # IO EXPANDER
+
+        <img class="img-50" src="images/fpgas/fpga_io_expander.svg"></img>
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # COMMUNICATIONS
+
+        <img class="img-50" src="images/fpgas/fpga_comms.svg"></img>
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+            # COPROCESSOR
+
+            <img class="img-50" src="images/fpgas/fpga_coprocessor.svg"></img>
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+            # CLUSTER
+
+            <img class="img-50" src="images/fpgas/fpga_cluster.svg"></img>
+        </textarea>
+</section>
+ -->
+
+<section data-markdown>
+        <textarea data-template>
+            # PROCESSOR
+
+            <img class="img-50" src="images/fpgas/fpga_badge.svg"></img>
+
+            SoftCPU  - SoC
+
+        </textarea>
+    </section>
+
+
+    <!-- <section data-markdown>
+            <textarea data-template>
+                # SOFT CPU
+
+                <p class="fragment" >Must have a CPU?</p>
+                <p class="fragment" >A whole CPU in Verilog (RISC-V, PIC, Z80, ARM)</p>
+                <p class="fragment" >Incredible power - bring in the whole software world</p>
+                <p class="fragment" >SoC - System on  a Chip - is a SoftCPU + peripherals</p>
+
+            </textarea>
+        </section> -->
+
+    <section data-markdown>
+            <textarea data-template>
+                # SOFT CPU CODE
+
+```
+picorv32  core1 (
+    .clk         (clk        ),
+    .resetn      (resetn     ),
+    .mem_valid   (mem_valid  ),
+    .mem_instr   (mem_instr  ),
+    .mem_ready   (mem_ready  ),
+    .mem_addr    (mem_addr   ),
+    .mem_wdata   (mem_wdata  ),
+    .mem_wstrb   (mem_wstrb  ),
+    .mem_rdata   (mem_rdata  )
+);
+```
+            </textarea>
+        </section>
+
+
+    <section data-markdown>
+        <textarea data-template>
+            # SOFT CPU ARCHITECTURE
+
+            <img class="img-50" src="images/coding/soc.svg"></img>
+
+        </textarea>
+    </section>
+
+    <section data-markdown>
+            <textarea data-template>
+                # SOFT CPU TOOLCHAIN
+
+                <img class="img-75" src="images/coding/soc_symbiflow_highlight.svg"></img>
+
+            </textarea>
+        </section>
+
+    <section data-markdown>
+        <textarea data-template>
+
+            # SOFT CPU APPLICATION
+
+``` C
+int main() {
+  while (1) {
+    LED = 0xFF;
+    print("hello world\n");
+    delay();
+    LED = 0x00;
+    delay();
+  }
+}
+```
+        </textarea>
+    </section>
+
+<!-- 
+<section data-markdown>
+    <textarea data-template>
+        # SOFT CPU OVERVIEW
+
+        <p class="fragment">Choose your core - RISC-V, ARM, Z80, 6502, PIC, etc.</p>
+        <p class="fragment">Can instantiate many cores</p>
+        <p class="fragment">Slower than a conventional MCU</p>
+        <p class="fragment">Will do better than Verilog in some situations</p>
+        <p class="fragment">Can use a lot of resources on a small FPGA</p>
+        <p class="fragment">Requires Verilog code to get to low level FPGA resources</p>
+        <p class="fragment">Use existing C / C++ code libraries</p>
+
+    </textarea>
+</section> -->
+
+
+<section  data-background-image="./images/spoke_large.png" data-background-opacity=0.9>
+    <h1 class="big white shadow">THE BADGE</h1>
+</section>
+
+<section>
+
+    <h1>OUTSIDE</h1>
+
+    <img class="img-25" src="images/badge/2019-Hackaday-Superconference-Badge.jpg"></img>
+
+</section>
+
+<section>
+
+    <h1>INSIDE</h1>
+
+    <img class="img-75" src="images/badge/badge_internals.svg"></img>
+
+</section>
+
+
+<section  data-background-image="./images/spoke_large.png" data-background-opacity=0.9>
+    <h1 class="big white shadow">MicroFPGA</h1>
+</section>
+
+<!-- 
+<section data-markdown>
+    <textarea data-template>
+        # HOVERBOARDS
+
+        <img class="img-25" src="images/hoverboards/halo_go.png"></img>
+        <img class="img-25" src="images/hoverboards/razor.jpg"></img>
+        <img class="img-25" src="images/hoverboards/swagtron.jpg"></img>
+        <img class="img-25" src="images/hoverboards/epikgo.jpg"></img>
+        <img class="img-25" src="images/hoverboards/otto.jpg"></img>
+        <img class="img-25" src="images/hoverboards/swagtron_t6.jpg"></img>
+
+        <p class="mini">https://www.16best.net/best-hoverboard-brands/</p>
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+
+        # MODULAR
+
+        <img class="img-75" src="images/hoverboards/2QwuUe6bSTcYFwCk.jpg"></img>
+
+        <p class="mini">https://www.ifixit.com/Teardown/Swagway+Teardown/60256</p>
+
+    </textarea>
+</section> -->
+
+<section data-markdown>
+        <textarea data-template>
+            # FPGA
+
+            <img class="img-50"  src="images/intro/robot_architecture.svg"></img>
+
+            ## What changes?
+
+        </textarea>
+    </section>
+
+
+<section data-markdown>
+        <textarea data-template>
+            # MICROCONTROLLERS - OUT
+
+            <img class="img-50" src="images/mcus/stm32_pinout.png"></img>
+
+            <p class="fragment">Fixed peripherals.  Fixed IO's.  Slow.  One thing at a time.</p>
+
+        </textarea>
+</section>
+
+
+<!-- <section data-markdown>
+        <textarea data-template>
+            # FPGAS - IN
+
+            <img class="img-50" src="images/fpgas/fpga_bg381.jpeg"></img>
+
+        </textarea>
+</section>
+ -->
+
+<!--
+<section data-markdown>
+        <textarea data-template>
+            ### MICROCONTROLLERS
+
+            # TEESNY 4.0
+
+            <img class="img-50" src="images/mcus/teensy_4_0.png"></img>
+
+        </textarea>
+</section> -->
+<!--
+<section data-markdown>
+        <textarea data-template>
+            ### MICROCONTROLLERS
+
+            # THE GOOD
+
+            <p class="fragment" >Write code instead of build hardware</p>
+            <p class="fragment" >Share code</p>
+            <p class="fragment" >Diversity of parts</p>
+            <p class="fragment" >Diversity of IO</p>
+            <p class="fragment" >Low power if careful</p>
+
+        </textarea>
+</section>
+
+<section data-markdown>
+        <textarea data-template>
+            ### MICROCONTROLLERS
+
+            # THE BAD
+
+            <p class="fragment" >Not enough IO</p>
+            <p class="fragment" >Slow comms</p>
+            <p class="fragment" >Wrong peripherials</p>
+            <p class="fragment" >Fixed peripherals</p>
+            <p class="fragment" >Change requirements -> change parts</p>
+            <p class="fragment" >Incompatible parts (no low level code sharing)</p>
+
+        </textarea>
+</section> -->
+
+<section data-markdown>
+        <textarea data-template>
+            # FPGAS - IN
+
+            <img class="img-10" src="images/fpgas/fpga_bg381.jpeg"></img>
+            <img class="img-10" src="images/fpgas/fpga_bga256.jpg"></img>
+
+            <p class="fragment" >Can have a CPU - can still write code</p>
+            <p class="fragment" >Plenty of IO</p>
+            <p class="fragment" >Fast</p>
+            <p class="fragment" >Write the peripherals you want</p>
+            <p class="fragment" >Upgrade in the Field (it's in the name!)</p>
+
+        </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # USE FPGA MODULES!
+
+        <img class="img-10" src="images/fpgas/Cmod_A7.png"></img>
+        <img class="img-10" src="images/fpgas/tinyfpga_bx.jpg"></img>
+        <img class="img-10" src="images/fpgas/tiny_fpga_ax2.jpg"></img>
+        <img class="img-10" src="images/fpgas/TEI0003-02_0_600x600.jpg"></img>
+
+        CMod A7 ($75), TinyFPGA BX ($42), TinyFPGA AX2 ($22), CYC100 ($35)
+
+        <p class="fragment">No need to work with BGAs directly</p>
+
+        <p class="fragment">Often Provide: Memory (Flash and RAM), Programming Interface</p>
+
+    </textarea>
+</section>
+
+<!-- <section data-markdown>
+    <textarea data-template>
+        # MODULES
+
+        <img class="img-10" src="images/fpgas/tinyfpga_bx.jpg"></img>
+
+        <p class="fragment">FPGA</p>
+        <p class="fragment">Memory (Flash and RAM)</p>
+        <p class="fragment">Programming interface</p>
+        <p class="fragment">IO</p>
+        <p class="fragment">Use an existing one or make one yourself</p>
+        <p class="fragment">Share!</p>
+
+    </textarea>
+</section>
+ -->
+
+<section data-markdown>
+    <textarea data-template>
+        # WHAT TO DO WITH OLD STANDARDS?
+
+        <p class="fragment">Often provided as Microcontroller Peripherals</p>
+        <p class="fragment bold"><b>ABANDON STANDARDS YOU DON'T LIKE!</b></p>
+        <p class="fragment bold"><b>WRITE YOUR OWN PERIPHERALS!</b></p>
+
+    </textarea>
+</section>
+
+<!-- <section data-markdown>
+    <textarea data-template>
+        # WHAT TO DO WITH SPECIAL PURPOSE CHIPS?
+
+        Power Management
+
+        Interface
+
+    </textarea>
+</section>
+
+<section data-markdown>
+        <textarea data-template>
+            # LTC4281
+
+            <img class="img-50" src="images/special_purpose_chips/ltc4281_example.png"></img>
+
+            <p class="mini">https://www.analog.com/media/en/technical-documentation/data-sheets/LTC4281.pdf</p>
+
+        </textarea>
+</section>
+
+<section data-background-iframe="documents/LTC4281.pdf" data-background-interactive>
+
+</section>
+
+<section data-markdown>
+        <textarea data-template>
+            # REGISTERS
+
+            <img class="img-25" src="images/special_purpose_chips/ltc4281_registers_1.png"></img>
+            <img class="img-25" src="images/special_purpose_chips/ltc4281_registers_2.png"></img>
+
+        </textarea>
+</section>
+ -->
+
+<!-- <section data-markdown>
+        <textarea data-template>
+            # WHAT TO DO WITH SPECIAL PURPOSE CHIPS?
+
+            <p class="fragment">Special purpose chips = special circuits + interface / control logic</p>
+
+            <p class="fragment">Have fixed functionality</p>
+            <p class="fragment">Offer crude diagnostics</p>
+
+            <p class="fragment bold"><b>BUILD THE SPECIAL CIRCUITS AND CONTROL THEM FROM THE FPGA!</b></p>
+
+        </textarea>
+</section> -->
+
+<!-- 
+<section data-markdown>
+        <textarea data-template>
+            # HOW TO INTEGRATE SENSORS AND ACTUATORS?
+
+            <p class="fragment">NO AD HOC INTERFACING!</p>
+            <p class="fragment">Use Modular Add-Ons - Pmods</p>
+            <p class="fragment">Good standard</p>
+            <p class="fragment">Not widely known</p>
+            <p class="fragment">Hard to use with fixed IO microcontrollers</p>
+            <p class="fragment">Easy to use with FPGAs</p>
+            <p class="fragment">Good selection already</p>
+        </textarea>
+</section> -->
+
+<!-- <section data-markdown>
+        <textarea data-template>
+            ### PMODS
+
+            # MOTIVATION
+
+            <img class="img-50" src="images/pmods/Pinout_of_ARDUINO_Board_and_ATMega328PU.svg"></img>
+
+            How can you make modular hardware out of that?  Yet people are trying...
+
+        </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        ### PMODS
+
+        # Motivation
+
+        <img class="img-75" src="images/pmods/LFE5UM5G-85F-EVN-revB-side.png"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        ### PMODS
+
+        # Motivation
+
+        <img class="img-75" src="images/pmods/LFE5UM5G-85F-EVN-revB-bottom.png"></img>
+
+    </textarea>
+</section> -->
+
+
+<section data-markdown>
+    <textarea data-template>
+        # USE PMODS!
+
+        <img class="img-10" src="images/pmods/Pmod_ACL2.png"></img>
+        <img class="img-10" src="images/pmods/Pmod_DPG1.png"></img>
+        <img class="img-10" src="images/pmods/Pmod-ESP32.png"></img>
+        <img class="img-10" src="images/pmods/Pmod_MFG_410-077.jpg"></img>
+        <img class="img-10" src="images/pmods/Pmod_MFG_410-347.jpg"></img>
+        <img class="img-10" src="images/pmods/Pmod_MIC3.png"></img>
+        <img class="img-10" src="images/pmods/Pmod_NAV.png"></img>
+        <img class="img-10" src="images/pmods/Pmod_OLEDrgb.png"></img>
+        <img class="img-10" src="images/pmods/Pmod_RTCC.png"></img>
+        <img class="img-10" src="images/pmods/PmodSSR.png"></img>
+        <img class="img-10" src="images/pmods/EVAL-AD7980-PMDZ.jpg"></img>
+        <img class="img-10" src="images/pmods/EVAL-CN0355-PMDZ.jpg"></img>
+        <img class="img-10" src="images/pmods/DPP401Z000.jpeg"></img>
+        <img class="img-10" src="images/pmods/TEP0002-02.jpg"></img>
+        <img class="img-10" src="images/pmods/TDGL012.jpg"></img>
+        <img class="img-10" src="images/pmods/pmod-hdmi_1024x1024.jpg"></img>
+        <img class="img-10" src="images/pmods/pmod-led-panel_1024x1024.jpg"></img>
+
+    </textarea>
+</section>
+
+<!--
+<section data-markdown>
+        <textarea data-template>
+            ### PMODS
+
+            # SPECS
+
+            <img class="img-50" src="images/pmods/pmod_12pin_female_spec.png"></img>
+
+            <p class="mini">https://reference.digilentinc.com/_media/reference/pmod/pmod-interface-specification-1_2_0.pdf</p>
+        </textarea>
+    </section>
+
+<section data-markdown>
+        <textarea data-template>
+            ### PMODS
+
+            # SPECS
+
+            <img class="img-50" src="images/pmods/pmod_12pin_male_spec.png"></img>
+
+            <p class="mini">https://reference.digilentinc.com/_media/reference/pmod/pmod-interface-specification-1_2_0.pdf</p>
+        </textarea>
+    </section>
+
+<section data-markdown>
+        <textarea data-template>
+            ### PMODS
+
+            # SPECS
+
+            <img class="img-33" src="images/pmods/pmod_spec_multiple.png"></img>
+
+            <p class="mini">https://reference.digilentinc.com/_media/reference/pmod/pmod-interface-specification-1_2_0.pdf</p>
+        </textarea>
+    </section>
+
+<section data-markdown>
+    <textarea data-template>
+        ### PMODS
+
+        # SPECS
+
+        <img class="img-33" src="images/pmods/pmod_signals_spec.png"></img>
+
+        <p class="mini">https://reference.digilentinc.com/_media/reference/pmod/pmod-interface-specification-1_2_0.pdf</p>
+    </textarea>
+</section>
+
+    <section data-markdown>
+    <textarea data-template>
+        ### PMODS
+
+        # THE GOOD
+
+        <p class="fragment">All pins are equal</p>
+        <p class="fragment">Mechanically Stable</p>
+        <p class="fragment">8 GPIO Pins is pretty good</p>
+        <p class="fragment">0.1" grid is very common and convenient</p>
+        <p class="fragment">Can solder wires directly onto the board, Can use Wire to Board systems etc.</p>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        ### PMODS
+
+        # THE BAD
+
+        <p class="fragment">Expansion is hard (two side by side connectors is not good)</p>
+        <p class="fragment">Single Row is too weak to support a board.  Floppy.</p>
+        <p class="fragment">8 signals is too many for some applications, too few for others</p>
+        <p class="fragment">Ambiguous power (3.3V?  5V?)</p>
+        <p class="fragment">No provision for multiple power supplies</p>
+
+    </textarea>
+</section> -->
+<!-- 
+<section data-markdown>
+    <textarea data-template>
+        # ENHANCEMENT - XMOD
+
+        <img class="img-10" src="images/pmods/PPPC022LJBN-RC.jpg"></img>
+        <img class="img-10" src="images/pmods/PPPC042LJBN-RC.jpg"></img>
+        <img class="img-10" src="images/pmods/PPPC062LJBN-RC.jpg"></img>
+        <img class="img-10" src="images/pmods/PPPC082LJBN-RC.jpg"></img>
+        <img class="img-10" src="images/pmods/PPPC102LJBN-RC.jpg"></img>
+
+        <h2 class="fragment"> Changes</h2>
+        <p class="fragment">Backward compatible with Pmods (can use Pmods in all suitably sized slots)</p>
+        <p class="fragment">Pins number from the power, not the other end</p>
+        <p class="fragment">One power line is V+</p>
+        <p class="fragment">Dual Row Only.  Single row is not stable.</p>
+        <p class="fragment">Can be 2 x 2 (power only) -> n x 2</p>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # XMOD PINS
+
+        | Pin | Function | Comment
+        | --- | ---      | ---
+        | 1   | V+       | Wide Range (0V-12V?)
+        | 2   | 3V3      | Standardized at 3.3V
+        | 3   | GND      |
+        | 4   | GND      | Minimal connector - 2 x 2 power only
+        | 5   | IO[0]    | General IO - also +ve LVDS Pair
+        | 6   | IO[1]    | General IO - also -ve LVDS Pair
+        | ... | IO[n]    |
+
+        Let's Discuss!
+    </textarea>
+</section> -->
+
+<!--
+<section data-markdown data-transition="slide-in none-out">
+    <textarea data-template>
+        # HOST & DEVICE
+
+        <img class="img-75" src="images/fpgas/microfpga_xmod_host_device.svg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown data-transition="none">
+    <textarea data-template>
+        # DEVICE
+
+        <img class="img-75" src="images/fpgas/microfpga_xmod_device.svg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown data-transition="none">
+    <textarea data-template>
+        # HOST
+
+        <img class="img-75" src="images/fpgas/microfpga_xmod_host.svg"></img>
+
+    </textarea>
+</section>
+
+
+<section data-markdown data-transition="none">
+    <textarea data-template>
+        # NUMBERING
+
+        <img class="img-75" src="images/fpgas/microfpga_xmod_annotation.svg"></img>
+
+    </textarea>
+</section> -->
+
+<section data-markdown >
+        <textarea data-template>
+            # HOW TO CONNECT FPGA MODULES AND PMODS?
+
+            <img class="img-25" src="images/pmods/Pmod_TinyFPGA_BX_Base_ortho.jpg"></img>
+
+            Baseboards!
+
+            <p class="fragment">Easy to design</p>
+            <p class="fragment">Cheap to manufacture</p>
+            <p class="fragment">Present the FPGA IO's in different configurations</p>
+
+        </textarea>
+    </section>
+
+    <!-- <section data-markdown data-transition="slide-in">
+            <textarea data-template>
+                # TinyFPGA BX w/3 Xmods
+
+                <img class="img-75" src="images/pmods/tinyfpga_bx_pmod_v0.1.png"></img>
+
+            </textarea>
+        </section>
+ -->
+
+
+<section data-markdown>
+    <textarea data-template>
+        # HARDWARE SUMMARY
+
+        FPGA MODULES - BASE BOARDS - PMODS
+
+    </textarea>
+</section>
+
+<section data-markdown data-transition="slide-in none-out">
+    <textarea data-template>
+        # FPGA MODULE
+
+        <img class="img-50" src="images/fpgas/microfpga_module.svg"></img>
+
+        Existing or make your own.  Share!
+
+    </textarea>
+</section>
+
+<section data-markdown data-transition="none">
+    <textarea data-template>
+        # BASE BOARD
+
+        <img class="img-50" src="images/fpgas/microfpga_base.svg"></img>
+
+        Existing or make your own.  Share!
+
+    </textarea>
+</section>
+<!--
+<section data-markdown data-transition="none">
+    <textarea data-template>
+        # XMODS
+
+        <img class="img-50" src="images/fpgas/microfpga_xmods.svg"></img>
+
+        Just plug in existing XMods
+    </textarea>
+</section> -->
+
+<section data-markdown data-transition="none">
+    <textarea data-template>
+        # PMODS
+
+        <img class="img-50" src="images/fpgas/microfpga_boards.svg"></img>
+
+        Existing or make your own.  Share!
+
+    </textarea>
+</section>
+
+
+<section data-markdown >
+    <textarea data-template>
+        # HOW TO DO FAST COMMUNICATIONS IN A NOISY ENVIRONMENT
+
+        <img class="img-25" src="images/pmods/Pmod_MLVDS_ortho.jpeg"></img>
+
+        M-LVDS *Trivial* at 50Mbps - Goes way up
+
+        Can add more wires for rate multiplier
+
+    </textarea>
+</section>
+
+<!-- <section data-markdown >
+    <textarea data-template>
+        # LVDS OPERATING CIRCUIT
+
+        <img class="img-50" src="images/pmods/LVDS_circuit_operation.png"></img>
+
+        <p class="micro">Dave at ti [CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0)]</p>
+
+        <p class="mini">LVDS Owners Manual - http://www.ti.com/lit/ug/snla187/snla187.pdf</p>
+
+    </textarea>
+</section> -->
+
+<!-- <section data-markdown >
+    <textarea data-template>
+        # LVDS CABLE LENGTHS
+
+        <img class="img-50" src="images/pmods/lvds_cable_length.png"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown >
+    <textarea data-template>
+        # M-LVDS WAVEFORMS
+
+        <img class="img-75" src="images/pmods/mlvds_data_decode.png"></img>
+
+    </textarea>
+</section> -->
+
+<section data-markdown>
+    <textarea data-template>
+        # TRANS-SPECIES LOOPBACK
+
+        <img class="img-50" src="images/pmods/usb_lvds_loopback_hw.jpeg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # 30 FEET = 60 NS
+
+        <img class="img-50" src="images/pmods/m-lvds-100Mhz-30ft.jpeg"></img>
+
+    </textarea>
+</section>
+
+<!-- <section data-markdown >
+    <textarea data-template>
+        # USB
+
+        <img class="img-50" src="images/pmods/Pmod_usb_nasty.jpeg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # USB ON XILINX
+
+        <img class="img-50" src="images/pmods/dual_usb_cmoda7_hw.jpg"></img>
+
+        Same code works on iCE40, ECP5, many others
+
+    </textarea>
+</section> -->
+
+ <section data-markdown >
+    <textarea data-template>
+        # HOW TO DO ANALOG IO?
+
+        <img class="img-50" src="images/pmods/Pmod_AD5592.jpeg"></img>
+
+        Put ADC's on the Baseboard or PMods.
+
+        <p class="fragment">Chips like AD5592R</p>
+
+    </textarea>
+</section>
+
+<!-- <section data-markdown data-transition="slide">
+    <textarea data-template>
+        # AD5592R
+
+        <img class="img-50" src="images/pmods/AD5592R-fbl.png"></img>
+
+        <p class="mini">https://www.analog.com/en/products/ad5592r.html</p>
+
+    </textarea>
+</section> -->
+
+<section data-markdown data-transition="slide">
+    <textarea data-template>
+        # HOW TO DO MOTOR CONTROL?
+
+        <img class="img-50" src="images/pmods/pmod_motor_4_10a_v0_11_kicad_3d.png"></img>
+
+        <p class="fragment">Motor Drivers</p>
+        <p class="fragment">ADC for voltage and current sensing</p>
+        <p class="fragment">Provision for shaft encoder or resistive position sensor</p>
+        <p class="fragment">All sensing and control through 8 pins</p>
+
+    </textarea>
+</section>
+<!-- 
+<section data-markdown data-transition="slide">
+    <textarea data-template>
+        # Schematic
+
+        <img class="img-50" src="images/pmods/pmod_motor_4_10a_sch.png"></img>
+
+    </textarea>
+</section>
+
+<section data-background-iframe="sozi/pmod_4_10A_sch.sozi.html" data-background-interactive>
+    <div style="position: absolute; width: 1%; right: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.5), 0 5px 25px rgba(0,0,0,0.2); background-color: rgba(60, 60, 60, 0.9); color: #fff; padding: 20px; font-size: 20px; text-align: right;">
+    </div>
+</section> -->
+
+<!-- <section data-markdown >
+    <textarea data-template>
+        # Waves
+
+        <img class="img-50" src="images/pmods/pmod_motor_4_10a_pwm.png"></img>
+
+        <span class="fragment" style="padding-right:40px;">D0-D3 - Shift Register</span>
+        <span class="fragment" style="padding-right:40px;" >D11 - PWM signal </span>
+        <span class="fragment" style="padding-right:40px;">D12 - PWM Center </span><br>
+        <span class="fragment" style="padding-right:40px;">Yellow M0 </span>
+        <span class="fragment" style="padding-right:40px;">Cyan M1 </span>
+        <span class="fragment" style="padding-right:40px;">Purple I1 Current</span>
+
+    </textarea>
+</section> -->
+
+<section data-markdown>
+    <textarea data-template>
+        # CODING
+
+        <img class="img-50" src="images/fpgas/microfpga_code_setup.svg"></img>
+
+        What about MicroFPGA Coding?
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # SoC
+
+        <img class="img-50" src="images/fpgas/microfpga_soc.svg"></img>
+
+        <img class="img-33" src="images/coding/soc_symbiflow_highlight.svg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # VERILOG
+
+        <img class="img-50" src="images/fpgas/microfpga_verilog.svg"></img>
+
+        <img class="img-33" src="images/coding/symbiflow.svg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # MODULARITY
+
+        Verilog is very low level
+
+        The temptation to write non-standard interfaces is high!
+
+        <img class="img-33" src="images/coding/apples.svg"></img>
+        <img class="img-33" src="images/coding/oranges.svg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # PIPELINES
+
+        <img class="img-33" src="images/coding/pipelines_data.svg"></img>
+
+        Industry convention
+
+    </textarea>
+</section> 
+ 
+<section data-markdown>
+    <textarea data-template>
+        # DATA
+
+        <img class="img-33" src="images/coding/pipelines_data.svg"></img>
+
+        <img class="fragment img-75" src="images/coding/pipelines_data_wave.svg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # VALID
+
+        <img class="img-33" src="images/coding/pipelines_data_valid.svg"></img>
+
+        <img class="fragment img-75" src="images/coding/pipelines_data_valid_wave.svg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # READY
+
+        <img class="img-33" src="images/coding/pipelines_data_valid_ready.svg"></img>
+
+        <img class="fragment img-75" src="images/coding/pipelines_data_valid_ready_wave.svg"></img>
+
+    </textarea>
+</section> 
+
+<section data-markdown>
+    <textarea data-template>
+        # START / STOP
+
+        <img class="img-33" src="images/coding/pipelines_data_valid_ready_start_stop.svg"></img>
+
+        <img class="fragment img-75" src="images/coding/pipelines_data_valid_ready_start_stop_wave.svg"></img>
+
+    </textarea>
+</section>
+
+
+<section data-markdown>
+    <textarea data-template>
+        # PIPES
+
+        <img class="img-33" src="images/coding/pipelines_data_valid_ready_start_stop.svg"></img>
+
+        <img class="fragment img-33" src="images/coding/pipelines_pipes.svg"></img>
+
+        <img class="fragment img-75" src="images/coding/pipelines_p_d8s.svg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # PIPES
+
+``` verilog
+producer #( ... ) p (
+    ...
+    .out_pipe( xferPipe )
+    ...
+);
+
+consumer #( ... ) c (
+    ...
+    .in_pipe( xferPipe )
+    ...
+);
+
+```
+    </textarea>
+</section>
+
+<!-- <section data-markdown>
+    <textarea data-template>
+        # SPOKEFPGA - EXISTING LIBRARY
+
+        <div class="box fragment">FIXED_POINT MATH</div>
+        <div class="box fragment">I2C_MASTER</div>
+        <div class="box fragment">I2C_SLAVE</div>
+        <div class="box fragment">SPI_MASTER</div>
+        <div class="box fragment">SPI_SLAVE</div>
+        <div class="box fragment">FAST_COMMS</div>
+        <div class="box fragment">USB</div>
+        <div class="box fragment">UART</div>
+        <div class="box fragment">FIFO</div>
+        <div class="box fragment">ESCAPE</div>
+        <div class="box fragment">UNESCAPE</div>
+        <div class="box fragment">PID</div>
+        <div class="box fragment">QUADRATURE</div>
+        <div class="box fragment">PWM</div>
+        <div class="box fragment">SHIFT_REGISTER</div>
+        <div class="box fragment">PRIORITY_ENCODER</div>
+        <div class="box fragment">TIMER</div>
+        <div class="box fragment">CRC16</div>
+        <div class="box fragment">BADGE CODE</div>
+
+        <p class="fragment">https://github.com/davidthings/spokefpga</p>
+
+    </textarea>
+</section> -->
+
+<!-- <section data-markdown>
+    <textarea data-template>
+        # CODE - FAST COMMS
+
+        <img class="img-50" src="images/pmods/m-lvds-100Mhz-30ft.jpeg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # FAST COMMS
+
+        <img src="images/coding/fast_comms_diagram.svg"></img>
+
+        Each side has one of these modules
+
+    </textarea>
+</section> -->
+
+<section data-markdown>
+    <textarea data-template>
+        # BADGE CAMERA
+
+        <img class="img-50" src="images/badge/arducam.jpeg"></img>
+
+        LCD driver and Camera Driver
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # IMAGE PIPELINE
+
+        <img class="img-75" src="images/coding/badge_image_pipeline.svg"></img>
+
+        <img class="fragment img-75" src="images/coding/pipelines_data_valid_ready_start_stop_wave.svg"></img>
+
+    </textarea>
+</section>
+
+<!-- <section data-markdown>
+    <textarea data-template>
+        # TEST PROBES
+
+        <img class="img-50" src="images/badge/fpga_camera_testing.jpeg"></img>
+
+    </textarea>
+</section> -->
+<!--
+<section data-markdown>
+    <textarea data-template>
+        # FIRST WORKING BUILD
+
+        <img class="img-50" src="images/badge/fpga_cam_3.jpeg"></img>
+
+    </textarea>
+</section>
+ -->
+<section data-markdown>
+    <textarea data-template>
+        # FIRST FULL FRAME BUILD
+
+        <img class="img-50" src="images/badge/fpga_cam_full_frame.jpeg"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # CARTRIDGE BOARD
+
+        <img class="img-50" src="images/badge/spokefpga_camera_cartridge.png"></img>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # WORK IN PROGRESS
+
+        <p class="fragment">ImageScaler</p>
+        <p class="fragment">BayerToRGB</p>
+        <p class="fragment">Fonts</p>
+        <p class="fragment">Charts</p>
+        <p class="fragment">Multiplexors</p>
+
+    </textarea>
+</section>
+
+<section data-background-image="./images/spoke_large.png" data-background-opacity=0.9>
+    <h1 class="big white shadow">WRINKLES</h1>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # FPGA DEVELOPMENT IS HARD
+
+        <p class="fragment">Verilog is not like learning another programming language</p>
+        <p class="fragment">Expect to have to reorganize your brain!</p>
+        <p class="fragment">I got this!  I don't got this... (repeat)</p>
+        <p class="fragment">Developing in a strange environment</p>
+        <p class="fragment">Tools are occasionally buggy and frequently obtuse</p>
+        <p class="fragment">Missing FPGA Features</p>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # STATE OF LIBRARIES
+
+        <p class="fragment">SHOCKING</p>
+        <p class="fragment">Almost 50 years of FPGA development has left miniscule code library trace</p>
+        <p class="fragment">Code is frequently buggy</p>
+        <p class="fragment">Code is frequently unfinished / unmaintained</p>
+        <p class="fragment">Testing is rudimentary</p>
+        <p class="fragment">Do not expect that what you are looking for will be there</p>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # MicroFPGA
+
+        <p class="fragment em">Design minimalistic FPGA Core Modules!</p>
+        <p class="fragment em">Design diverse base boards!</p>
+        <p class="fragment em">Design Pmod peripherals!</p>
+        <p class="fragment em">Write Modular, Interconnecting FPGA Code!</p>
+        <p class="fragment em">Write libraries for SoftCPU!</p>
+        <p class="fragment em">Develop control and interface technologies!</p>
+        <p class="fragment em">Replace special purpose chips!</p>
+        <p class="fragment em">Stop using annoying standards, replace!</p>
+        <p class="fragment em">Make projects and products with upgradable hardware!</p>
+        <p class="fragment em">Share your stuff!  We have 50 years to make up for!</p>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+    # END
+
+    ## david@davidthings.com
+
+    ## @davidthings
+
+    ## https://github.com/davidthings/spokefpga
+</textarea>
+</section>
+
+<section data-background-image="./images/spoke_large.png" data-background-opacity=0.9>
+    <h1 class="big white shadow">NEXT STEPS</h1>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # PROJECT IDEAS
+
+        <p class="fragment">Computational Camera</p>
+        <p class="fragment">Oscilloscope</p>
+        <p class="fragment">Logic Analyser</p>
+        <p class="fragment">Machine Vision</p>
+        <p class="fragment">Machine Hearing</p>
+        <p class="fragment">Machine Touch</p>
+        <p class="fragment">Smart Motor Controller</p>
+        <p class="fragment">Software Defined Radio</p>
+        <p class="fragment">Game Emulation</p>
+
+    </textarea>
+</section>
+
+<section data-markdown>
+    <textarea data-template>
+        # FPGA COMMUNITIES
+
+        <p class="fragment">Hard Core (Academic, Industry, etc.)</p>
+        <p class="fragment">Tool Nerds</p>
+        <p class="fragment">Product Developers</p>
+        <p class="fragment">Hackers</p>
+        <p class="fragment">Game Emulators</p>
+        <p class="fragment">Historical FPGA Hackers</p>
+
+    </textarea>
+</section>
+
+
+                </div>
+		</div>
+
+        <script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+                progress: false,
+                hash: true,
+                history: true,
+                width: 1600,
+	            height: 900,
+				dependencies: [
+                    // { src: 'plugin/hdelk/elk.bundled.js', async: true },
+                    // { src: 'plugin/hdelk/svg.min.js', async: true },
+                    // { src: 'plugin/hdelk/hdelk.js', async: true },
+    				{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true }
+				]
+			});
+        </script>
+
+    </body>
+
+</html>

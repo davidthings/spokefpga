@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+    <head>
+            <link rel="stylesheet" href="../css/theme/white.css">
+            <link rel="stylesheet" href="css/hdelk.css">
+    </head>
+<body>
+
+    <script src="js/elk.bundled.js"></script>
+    <script src="js/svg.min.js"></script>
+    <script src="js/hdelk.js"></script>
+
+
+    <div style="margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); zoom:3.0;" id="simple_diagram"></div>
+
+    <div style="position: absolute; top: 90%; left: 50%; transform: translate(-50%, -50%)">
+            <div class="btn" onclick="simple_graph_draw_state( 0 );" >B1</div>
+            <div class="btn" onclick="simple_graph_draw_state( 1 );" >B2</div>
+            <div class="btn" onclick="simple_graph_draw_state( 2 );" >B3</div>
+            <div class="btn" onclick="simple_graph_draw_state( 3 );" >B4</div>
+        </div>
+
+
+<script type="text/javascript">
+
+    var simple_graph_state = 0;
+
+    var simple_graph;
+
+    var simple_graph_draw_state = function( s ) {
+        switch ( s ) {
+            case 0:
+                simple_graph = {
+                    id: "",
+                    children: [
+                        { id: "in", port: 1 },
+                        { id: "one", ports: ["in", "out"] },
+                        { id: "two", highlight:2, ports: ["in", "out"] },
+                        { id: "three", ports: ["in", "out"] },
+                        { id: "out", port: 1 }
+                    ],
+                    edges: [
+                        ["in","one.in"],
+                        {route:["one.out","two.in"],highlight:1},
+                        {route:["two.out","three.in"],highlight:1,bus:1},
+                        {route:["three.out","out"], bus:1 }
+                    ]
+                }
+                hdelk.layout( simple_graph, "simple_diagram" );
+                break;
+            case 1:
+                simple_graph = {
+                    id: "",
+                    children: [
+                        { id: "in", port: 1 },
+                        { id: "one", ports: ["in", "out"] },
+                        { id: "two", highlight:2, ports: ["in", "out"] },
+                        { id: "three", ports: ["in", "out"] },
+                        { id: "out", port: 1 }
+                    ],
+                    edges: [
+                        {route:["in","one.in"],highlight:2},
+                        {route:["one.out","two.in"],highlight:2},
+                        {route:["two.out","three.in"],highlight:2,bus:1},
+                        {route:["three.out","out"], highlight:2, bus:2 }
+                    ]
+                }
+                // characteristics do change
+                simple_graph.edges[2].highlight = 2;
+
+                hdelk.layout( simple_graph, "simple_diagram" );
+                break;
+            case 2:
+                simple_graph = {
+                    children: [
+                        { id: "in", port: 1 },
+                        { id: "one", ports: ["in", "out"] },
+                        { id: "two", highlight:2, ports: ["in", "out"] },
+                        { id: "two_", highlight:2, ports: ["in", "out"] },
+                        { id: "three", ports: ["in", "out"] },
+                        { id: "out", port: 1 }
+                    ],
+                    edges: [
+                        ["in","one.in"],
+                        {route:["one.out","two.in"],highlight:1},
+                        {route:["one.out","two_.in"],highlight:1},
+                        {route:["two.out","three.in"],highlight:1,bus:1},
+                        {route:["two_.out","three.in"],highlight:1,bus:1},
+                        {route:["three.out","out"], bus:1 }
+                    ]
+                    };
+                hdelk.layout( simple_graph, "simple_diagram" );
+                break;
+            case 3:
+                simple_graph = {
+                    children: [
+                        { id: "in", port: 1 },
+                        { id: "one", ports: ["in", "out"] },
+                        { id: "two", highlight:2, ports: ["in", "out"] },
+                        { id: "three", ports: ["in", "out"] },
+                        { id: "out", port: 1 }
+                    ],
+                    edges: [
+                        ["in","one.in"],
+                        {route:["one.out","two.in"],highlight:1},
+                        {route:["two.out","three.in"],highlight:1,bus:1},
+                        {route:["three.out","out"], bus:1 }
+                    ]
+                };
+
+                hdelk.layout( simple_graph, "simple_diagram" );
+                break;
+        }
+
+        simple_graph_state = s;
+    }
+
+    simple_graph_draw_state( simple_graph_state );
+
+    var simple_graph_key = function( event ) {
+        var key = event.key || event.keyCode;
+
+        if ( key == 'ArrowDown')
+            if ( simple_graph_state < 3 )
+                simple_graph_draw_state( simple_graph_state + 1 );
+
+        if ( key == 'ArrowUp')
+            if ( simple_graph_state > 0 )
+                simple_graph_draw_state( simple_graph_state - 1 );
+    }
+
+    document.addEventListener( 'keyup', simple_graph_key );
+
+
+</script>
+
+</body>
+</html>

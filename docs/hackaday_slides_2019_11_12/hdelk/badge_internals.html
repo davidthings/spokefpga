@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+    <head>
+            <link rel="stylesheet" href="css/hdelk.css">
+    </head>
+<body>
+
+    <script src="js/elk.bundled.js"></script>
+    <script src="js/svg.min.js"></script>
+    <script src="js/hdelk.js"></script>
+
+
+    <div style="margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); zoom:1.0;" id="badge_soc"></div>
+
+    <script type="text/javascript">
+        const badge_soc = {
+        children: [ {
+            id:"board",
+            label:"",
+            color: "#BBB",
+            westPorts: [ "USB","HDMI" ],
+            eastPorts: [ "Cartridge", "Pmod" ],
+            children:[
+                { id: "LCD", color: "#BBB" },
+                { id: "FLASH", color: "#BBB" },
+                { id: "PSDRAM1", color: "#BBB" },
+                { id: "PSDRAM2", color: "#BBB" },
+                { id: "LEDs", color: "#BBB" },
+                { id: "Buttons", color: "#BBB" },
+                { id: "FPGA", label:"FPGA - ECP5", inPorts:["USB", "HDMI" ], outPorts:["PSDRAM","FLASH", "GPIO", "LCD"],
+                    children:[
+                    {id:"picorv32_0", highlight:2 },
+                    {id:"picorv32_1", highlight:2 },
+                    {id:"DMA", highlight:6 },
+                    {id:"GPU", highlight:3 },
+                    {id:"MMCache", highlight:5 },
+                    {id:"PIC", highlight:4 }
+                    ],
+                    edges:[
+                        ["picorv32_0","MMCache" ],
+                        ["picorv32_1","MMCache" ],
+                        ["DMA","MMCache" ],
+                        ["GPU","FPGA.LCD" ],
+                        ["MMCache","GPU" ],
+                        ["MMCache","PIC" ],
+                        ["PIC","FPGA.GPIO"],
+                        ["MMCache","FPGA.USB" ],
+                        ["MMCache","FPGA.PSDRAM" ],
+                        ["MMCache","FPGA.FLASH" ],
+                        ["GPU","FPGA.HDMI", -1 ]
+                    ] }
+            ],
+            edges: [
+                ["FPGA.PSDRAM","PSDRAM1"],
+                ["FPGA.PSDRAM","PSDRAM2"],
+                ["FPGA.FLASH","FLASH"],
+                ["FPGA.GPIO","Buttons"],
+                ["FPGA.GPIO","LEDs"],
+                ["FPGA.GPIO","board.Cartridge"],
+                ["FPGA.GPIO","board.Pmod"],
+                ["board.USB","FPGA.USB"],
+                ["board.HDMI","FPGA.HDMI"],
+                ["FPGA.LCD","LCD"]
+            ]
+        }
+    ]
+    };
+
+    hdelk.layout( badge_soc, "badge_soc" );
+
+    var simple_graph_key = function( event ) {
+        var key = event.key || event.keyCode;
+
+        if ( key == 'ArrowDown')
+            if ( simple_graph_state < 3 )
+                simple_graph_draw_state( simple_graph_state + 1 );
+
+        if ( key == 'ArrowUp')
+            if ( simple_graph_state > 0 )
+                simple_graph_draw_state( simple_graph_state - 1 );
+    }
+
+    document.addEventListener( 'keyup', simple_graph_key );
+
+
+</script>
+
+</body>
+</html>

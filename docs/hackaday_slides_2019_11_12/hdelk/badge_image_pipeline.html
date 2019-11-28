@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+            <link rel="stylesheet" href="css/hdelk.css">
+    </head>
+<body>
+
+    <script src="js/elk.bundled.js"></script>
+    <script src="js/svg.min.js"></script>
+    <script src="js/hdelk.js"></script>
+
+    <!-- <div style="text-align: center;">    <h1>INSIDE</h1></div> -->
+
+    <div style="margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); zoom:2.0;" id="badge_soc"></div>
+
+    <div id="pipe_data_valid_ready"></div>
+
+    <div id="pipe_messages"></div>
+
+    <div id="pipe_pipes"></div>
+
+    <script type="text/javascript">
+
+        var graph = {
+            children: [
+                { id: "camera_image", parameters:["Width","Height"],outPorts: ["image_out"], southPorts:["camera_hw"] },
+                { id: "image_fifo", label:"Line Buffer", type:"image_fifo", inPorts: ["image_in"], outPorts: ["image_out"] },
+                { id: "image_reformat", label:"Gray10-R5G6B5", type:"image_reformat", inPorts: ["image_in"], outPorts: ["image_out"] },
+                { id: "lcd_image", inPorts: ["image_in", "refresh"], southPorts: ["lcd_hw"] },
+                { id: "button", port:1 }
+            ],
+            edges: [
+                { route:["camera_image.image_out","image_fifo.image_in"], bus:1 },
+                { route:["image_fifo.image_out","image_reformat.image_in"], bus:1 },
+                { route:["image_reformat.image_out","lcd_image.image_in"], bus:1 },
+                { route:["button","lcd_image.refresh"] }
+            ]
+        }
+
+        hdelk.layout( graph, "pipe_pipes" );
+    </script>
+
+</body>
+</html>

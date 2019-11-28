@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+            <link rel="stylesheet" href="css/hdelk.css">
+    </head>
+<body>
+
+    <script src="js/elk.bundled.js"></script>
+    <script src="js/svg.min.js"></script>
+    <script src="js/hdelk.js"></script>
+
+    <!-- <div style="text-align: center;">    <h1>INSIDE</h1></div> -->
+
+    <div style="margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); zoom:2.0;" id="badge_soc"></div>
+
+
+<div id="fruit-apples" style="padding: 10px; display: inline-block;"></div>
+
+<div id="fruit-oranges" style="padding: 10px; display: inline-block;"></div>
+
+<script type="text/javascript">
+    const apples = {
+        children: [
+            { id: "Apples", outPorts: ["Apple1", "Apple2", "Apple3"] }
+        ]
+    }
+
+    hdelk.layout( apples, "fruit-apples" );
+
+    const oranges = {
+        children: [
+            { id: "Oranges", inPorts: [ "Orange1", "Orange2", "Orange3","Orange4"] }
+        ]
+    }
+
+    hdelk.layout( oranges, "fruit-oranges" );
+</script>
+
+</body>
+</html>

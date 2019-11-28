@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+            <link rel="stylesheet" href="css/hdelk.css">
+    </head>
+<body>
+
+    <script src="js/elk.bundled.js"></script>
+    <script src="js/svg.min.js"></script>
+    <script src="js/hdelk.js"></script>
+
+    <!-- <div style="text-align: center;">    <h1>INSIDE</h1></div> -->
+
+    <div style="margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); zoom:2.0;" id="badge_soc"></div>
+
+    <div id="pipe_data_valid_ready"></div>
+
+    <div id="pipe_messages"></div>
+
+    <script type="text/javascript">
+
+        var graph = {
+            children: [
+                { id: "p1", type:"Producer", eastPorts: ["out_start", "out_stop", "out_data", "out_valid", "out_ready"] },
+                { id: "p2", type:"Consumer", westPorts: [ "in_start", "in_stop", "in_data", "in_valid", "in_ready"] }
+            ],
+            edges: [
+                ["p1.out_start","p2.in_start"],
+                ["p1.out_stop","p2.in_stop"],
+                { route:["p1.out_data","p2.in_data"], bus:1 },
+                ["p1.out_valid","p2.in_valid"],
+                ["p2.in_ready","p1.out_ready",-1]
+            ]
+        }
+
+        hdelk.layout( graph, "pipe_messages" );
+    </script>
+
+</body>
+</html>

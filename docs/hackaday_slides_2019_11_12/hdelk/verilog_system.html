@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+            <link rel="stylesheet" href="css/hdelk.css">
+    </head>
+<body>
+
+    <script src="js/elk.bundled.js"></script>
+    <script src="js/svg.min.js"></script>
+    <script src="js/hdelk.js"></script>
+
+    <!-- <div style="text-align: center;">    <h1>INSIDE</h1></div> -->
+
+    <div style="margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); zoom:2.0;" id="badge_soc"></div>
+
+    <script type="text/javascript">
+        const badge_soc = {
+        children: [
+            {
+                id:"board",
+                label:"",
+                color:"#CCC",
+                children: [
+                    { id: "FLASH", color: "#BBB" },
+                    { id: "SRAM", color: "#BBB" },
+                    { id: "FPGA", label:"FPGA",
+                        inPorts:["USB" ],
+                        outPorts:["SRAM","FLASH", "GPIO", "XMOD", ],
+                        children:[
+                            { id:"A" },
+                            { id:"B" },
+                            { id:"C" },
+                            { id:"D" },
+                            { id:"E" }
+                        ],
+                        edges:[
+                            ["A", "B", 1],
+                            ["B", "C", 1],
+                            ["C", "D", 1],
+                            ["D", "E", 1],
+                        ] }
+                ],
+                inPorts:["USB"],
+                outPorts:["XMOD", "GPIO"],
+                edges: [
+                    ["board.USB","FPGA.USB"],
+                    ["FPGA.GPIO","board.GPIO"],
+                    ["FPGA.XMOD","board.XMOD"],
+                    ["FPGA.SRAM","SRAM"],
+                    ["FPGA.FLASH","FLASH"]
+                ]
+            }
+        ]
+    };
+
+    hdelk.layout( badge_soc, "badge_soc" );
+
+</script>
+
+</body>
+</html>

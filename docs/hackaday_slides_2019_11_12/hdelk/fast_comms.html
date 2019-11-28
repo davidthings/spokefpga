@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+    <head>
+            <link rel="stylesheet" href="css/hdelk.css">
+    </head>
+<body>
+
+    <script src="js/elk.bundled.js"></script>
+    <script src="js/svg.min.js"></script>
+    <script src="js/hdelk.js"></script>
+
+    <!-- <div style="text-align: center;">    <h1>INSIDE</h1></div> -->
+
+    <div style="margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); zoom:2.0;" id="badge_soc"></div>
+
+
+    <div id="fast_comms_full_duplex_internal_diagram"></div>
+
+    <script type="text/javascript">
+
+        const fast_comms_full_duplex_internal_diagram = {
+            id: "",
+            children: [
+                {
+                    id: "fast_comms_full_duplex",
+                    inPorts: [
+                        "pipe_in"
+                    ],
+                    outPorts: [
+                        "pipe_out"
+                    ],
+                    southPorts: [
+                        "clock_in",
+                        "data_in",
+                        "clock_out",
+                        "data_out"
+                    ],
+                    children: [
+                        {
+                            id: "full_duplex_control",
+                            label: "control logic",
+                            southPorts: [
+                                "out_control",
+                                "out_status",
+                                "escape_in",
+                                "escape_out",
+                                "in_control",
+                                "in_status"
+                            ]
+                        },
+                        {
+                            id: "fast_comms_in",
+                            label: "",
+                            type: "fast_comms_in",
+                            outPorts: [
+                                "pipe_out"
+                            ],
+                            southPorts: [
+                                "clock_in",
+                                "data_in"
+                            ]
+                        },
+                        {
+                            id: "fast_comms_out",
+                            label: "",
+                            type: "fast_comms_out",
+                            inPorts: [
+                                "pipe_in"
+                            ],
+                            southPorts: [
+                                "clock_out",
+                                "data_out"
+                            ]
+                        },
+                        {
+                            id: "comms_in_buffer",
+                            label: "",
+                            type: "comms_in_buffer",
+                            northPorts: [
+                                "control",
+                                "status",
+                            ],
+                            inPorts: [
+                                "pipe_in"
+                            ],
+                            outPorts: [
+                                "pipe_out"
+                            ]
+                        },
+                        {
+                            id: "comms_out_buffer",
+                            label: "",
+                            type: "comms_out_buffer",
+                            northPorts: [
+                                "control",
+                                "status",
+                            ],
+                            inPorts: [
+                                "pipe_in"
+                            ],
+                            outPorts: [
+                                "pipe_out"
+                            ]
+                        },
+                        {
+                            id: "pipe_escape",
+                            label: "",
+                            type: "pipe_escape",
+                            northPorts: [
+                                "escape_in"
+                            ],
+                            inPorts: [
+                                "pipe_in"
+                            ],
+                            outPorts: [
+                                "pipe_out"
+                            ]
+                        },
+                        {
+                            id: "pipe_unescape",
+                            label: "",
+                            type: "pipe_unescape",
+                            northPorts: [
+                                "escape_out"
+                            ],
+                            inPorts: [
+                                "pipe_in"
+                            ],
+                            outPorts: [
+                                "pipe_out"
+                            ]
+                        }
+                    ],
+                    edges:[
+                        ["fast_comms_full_duplex.pipe_in", "comms_out_buffer.pipe_in", 1],
+                        ["comms_in_buffer.pipe_out", "fast_comms_full_duplex.pipe_out", 1],
+                        // ["fast_comms_out.pipe_in", "fast_comms_full_duplex.pipe_in"],
+
+                        ["comms_out_buffer.pipe_out", "pipe_escape.pipe_in", 1],
+                        ["pipe_unescape.pipe_out", "comms_in_buffer.pipe_in",1],
+
+                        ["pipe_escape.pipe_out", "fast_comms_out.pipe_in", 1],
+                        ["fast_comms_in.pipe_out", "pipe_unescape.pipe_in", 1],
+
+                        ["fast_comms_full_duplex.clock_in", "fast_comms_in.clock_in"],
+                        ["fast_comms_full_duplex.data_in", "fast_comms_in.data_in", 1],
+                        ["fast_comms_out.clock_out", "fast_comms_full_duplex.clock_out"],
+                        ["fast_comms_out.data_out", "fast_comms_full_duplex.data_out", 1]
+    /*  Too messy with these connections in
+                            ,
+
+                        ["full_duplex_control.out_control","comms_out_buffer.control", -1],
+                        ["full_duplex_control.escape_in","pipe_escape.escape_in", -1],
+                        ["comms_out_buffer.status","full_duplex_control.out_status"],
+                        ["pipe_unescape.escape_out","full_duplex_control.escape_out", -1],
+                        ["full_duplex_control.in_control","comms_in_buffer.control"],
+                        ["comms_in_buffer.status","full_duplex_control.in_status",-1]
+    */
+                    ]
+                }
+            ],
+            edges: [
+            ]
+        }
+
+        hdelk.layout( fast_comms_full_duplex_internal_diagram, "fast_comms_full_duplex_internal_diagram" );
+    </script>
+
+</body>
+</html>

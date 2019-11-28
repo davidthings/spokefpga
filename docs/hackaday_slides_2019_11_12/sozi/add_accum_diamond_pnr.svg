@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="1600"
+   height="900"
+   viewBox="0 0 423.33332 238.12501"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.4 (f8dce91, 2019-08-02)"
+   sodipodi:docname="add_accum_diamond_pnr.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="256"
+     inkscape:cx="291.35107"
+     inkscape:cy="424.77069"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer5"
+     showgrid="false"
+     units="px"
+     inkscape:window-width="3773"
+     inkscape:window-height="2105"
+     inkscape:window-x="3907"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:groupmode="layer"
+     id="layer6"
+     inkscape:label="Layer 0"
+     style="display:inline">
+    <image
+       sodipodi:absref="../images/fpgas/add_accum_pnr_0_.png"
+       y="24.606245"
+       x="41.671871"
+       id="image6824"
+       xlink:href="../images/fpgas/add_accum_pnr_0_.png"
+       preserveAspectRatio="none"
+       height="193.54463"
+       width="343.4292"
+       style="stroke-width:2.35130954" />
+  </g>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-58.874983)"
+     style="display:inline">
+    <image
+       sodipodi:absref="../images/fpgas/add_accum_pnr_1_.png"
+       y="160.00954"
+       x="42.510746"
+       id="image6886"
+       xlink:href="../images/fpgas/add_accum_pnr_1_.png"
+       preserveAspectRatio="none"
+       height="51.189842"
+       width="91.638008"
+       style="stroke-width:8.71954441" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="Layer 2"
+     style="display:inline">
+    <image
+       sodipodi:absref="../images/fpgas/add_accum_pnr_2_.png"
+       y="114.6517"
+       x="54.573372"
+       id="image6948"
+       xlink:href="../images/fpgas/add_accum_pnr_2_.png"
+       preserveAspectRatio="none"
+       height="23.766287"
+       width="42.394672"
+       style="stroke-width:18.84768867" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer4"
+     inkscape:label="Layer 3"
+     style="display:inline">
+    <image
+       sodipodi:absref="../images/fpgas/add_accum_pnr_3_.png"
+       y="123.00713"
+       x="70.790047"
+       id="image7010"
+       xlink:href="../images/fpgas/add_accum_pnr_3_.png"
+       preserveAspectRatio="none"
+       height="5.9903531"
+       width="10.665578"
+       style="display:inline;stroke-width:75.04182434" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer19"
+     inkscape:label="Layer 3+"
+     style="display:inline">
+    <image
+       sodipodi:absref="../images/fpgas/add_accum_pnr_8.png"
+       y="124.58508"
+       x="71.932877"
+       id="image7171"
+       xlink:href="../images/fpgas/add_accum_pnr_8.png"
+       preserveAspectRatio="none"
+       height="2.7389133"
+       width="4.8957677"
+       style="stroke-width:163.64303589" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer5"
+     inkscape:label="Layer 4"
+     style="display:inline">
+    <image
+       sodipodi:absref="../images/fpgas/add_accum_pnr_4_.png"
+       y="125.18167"
+       x="75.309158"
+       id="image7073"
+       xlink:href="../images/fpgas/add_accum_pnr_4_.png"
+       preserveAspectRatio="none"
+       height="1.4857774"
+       width="2.6622381"
+       style="display:inline;stroke-width:300.23843384" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer20"
+     inkscape:label="Layer 5">
+    <image
+       sodipodi:absref="../images/fpgas/add_accum_pnr_5_.png"
+       y="125.70525"
+       x="76.239868"
+       id="image7234"
+       xlink:href="../images/fpgas/add_accum_pnr_5_.png"
+       preserveAspectRatio="none"
+       height="0.339643"
+       width="0.6082167"
+       style="stroke-width:1314.18005371" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer21"
+     inkscape:label="Layer 6">
+    <image
+       sodipodi:absref="../images/fpgas/add_accum_pnr_6_.png"
+       y="125.82945"
+       x="76.472069"
+       id="image7359"
+       xlink:href="../images/fpgas/add_accum_pnr_6_.png"
+       preserveAspectRatio="none"
+       height="0.085958667"
+       width="0.15542628"
+       style="stroke-width:5154.93408203" />
+  </g>
+</svg>

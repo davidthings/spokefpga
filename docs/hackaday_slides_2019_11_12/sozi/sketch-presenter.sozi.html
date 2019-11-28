@@ -1,0 +1,49 @@
+
+
+
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Untitled</title>
+        <style>
+            iframe {
+                border: 1px solid rgb(128, 128, 128);
+            }
+
+            .sozi-frame-preview, .sozi-controls {
+                text-align: center;
+                margin: 1rem 0;
+            }
+
+            iframe:first-child, iframe:last-child {
+                width: 40vh;
+                height: 30vh;
+            }
+
+            iframe:nth-child(2) {
+                width: 56vh;
+                height: 42vh
+            }
+
+            .sozi-notes {
+                margin: 0 25vw;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="sozi-frame-preview">
+            <iframe src="sketch.sozi.html"></iframe>
+            <iframe src="sketch.sozi.html"></iframe>
+            <iframe src="sketch.sozi.html"></iframe>
+        </div>
+        <div class="sozi-controls">
+            <input type="button" id="sozi-previous-btn" value="Prev">
+            <input type="button" id="sozi-next-btn"     value="Next">
+        </div>
+        <div class="sozi-notes"></div>
+
+        <script>"use strict";var currentFrameIndex=0,previews=[{index:-1},{index:0},{index:1}],mainSozi=void 0;function updatePreview(e){0<=e.index&&e.index<e.sozi.presentation.frames.length?e.sozi.player.jumpToFrame(e.index):e.sozi.player.enableBlankScreen()}function updateNotes(){var e=previews[1].sozi.player.currentFrame.notes;"string"==typeof e&&(document.querySelector(".sozi-notes").innerHTML=e)}function onSoziLoaded(n,o){!function e(){n.sozi?o(n.sozi):setTimeout(e,1)}()}function load(e){var i=document.querySelectorAll("iframe");previews.forEach(function(n,o){onSoziLoaded(i[o].contentWindow,function(e){(n.sozi=e).player.disableMedia(),e.player.pause(),e.presentation.enableMouseTranslation=e.presentation.enableMouseNavigation=e.presentation.enableKeyboardZoom=e.presentation.enableKeyboardRotation=e.presentation.enableKeyboardNavigation=!1,updatePreview(n),1===o&&updateNotes()})});var n=window.open(e,"sozi-presentation","width=600, height=400, scrollbars=yes");try{n.focus(),onSoziLoaded(n,function(e){(mainSozi=e).player.addListener("frameChange",onFrameChange)})}catch(e){alert("Could not open presentation window. Please allow popups for this site and refresh this page.")}}function onFrameChange(){previews[1].index=mainSozi.player.currentFrame.index,previews[0].index=previews[1].index-1,previews[2].index=previews[1].index+1,previews.forEach(updatePreview),updateNotes()}function next(){mainSozi.player.moveToNext()}function previous(){mainSozi.player.moveToPrevious()}window.addEventListener("load",function(){load(document.querySelector("iframe").src),document.getElementById("sozi-previous-btn").addEventListener("click",previous,!1),document.getElementById("sozi-next-btn").addEventListener("click",next,!1)},!1);</script>
+    </body>
+</body>

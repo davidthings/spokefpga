@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <head>
+            <link rel="stylesheet" href="../css/theme/white.css">
+            <link rel="stylesheet" href="css/hdelk.css">
+    </head>
+<body>
+
+    <script src="js/elk.bundled.js"></script>
+    <script src="js/svg.min.js"></script>
+    <script src="js/hdelk.js"></script>
+
+
+    <div style="margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); zoom:3.0;" id="simple_diagram"></div>
+
+
+<script type="text/javascript">
+
+    simple_graph = {
+        children: [
+            { id: "application", highlight:1, type:"C / C++" },
+            { id: "SoC", highlight:0, type:"VERILOG" },
+            { id: "Development", highlight:1, label:"", height:80, inPorts: [ { id:"c", label:" " },{ id:"v", label:" " } ], outPorts:[ { id:"bits", label:" " }  ],
+                children: [
+                    { id: "Yosys", highlight:0 },
+                    { id: "NextPnR", highlight:0 },
+                    { id: "Pack", highlight:4 },
+                    { id: "GCC", highlight:5 },
+                    { id: "OBJCOPY", highlight:6 }
+                ],
+                edges:[
+                    ["Development.c", "GCC" ],
+                    ["GCC", "OBJCOPY" ],
+                    ["OBJCOPY", "Pack" ],
+                    ["Development.v", "Yosys" ],
+                    ["Yosys", "NextPnR" ],
+                    ["NextPnR", "Pack" ],
+                    ["Pack", "Development.bits" ],
+                ]
+            },
+            { id: "configuration", highlight:1, type:"BITSTREAM" }
+        ],
+        edges: [
+            ["application","Development.c"],
+            ["SoC","Development.v"],
+            ["Development.bits","configuration"]
+        ]
+    };
+    hdelk.layout( simple_graph, "simple_diagram" );
+
+
+</script>
+
+</body>
+</html>
